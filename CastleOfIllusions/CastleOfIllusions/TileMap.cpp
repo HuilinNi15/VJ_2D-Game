@@ -51,10 +51,9 @@ bool TileMap::loadLevel(const string &levelFile)
 	ifstream fin;
 	string line, tilesheetFile;
 	stringstream sstream;
-	char tile;
-	
+
 	fin.open(levelFile.c_str());
-	if(!fin.is_open())
+	if(!fin.is_open())	
 		return false;
 	getline(fin, line);
 	if(line.compare(0, 7, "TILEMAP") != 0)
@@ -82,24 +81,32 @@ bool TileMap::loadLevel(const string &levelFile)
 	tileTexSize = glm::vec2(1.f / tilesheetSize.x, 1.f / tilesheetSize.y);
 	
 	map = new int[mapSize.x * mapSize.y];
-	for (int j = 0; j < mapSize.y; j++) {
+	for(int j=0; j<mapSize.y; j++)
+	{
 		getline(fin, line);
+		//cout << line << endl;
 		stringstream ss(line);
 		int tile;
 
-		for (int i = 0; i < mapSize.x; i++) {
+		for (int i = 0; i < mapSize.x; i++)
+		{
 			ss >> tile;
 			map[j * mapSize.x + i] = tile;
 		}
+#ifndef _WIN32
+		fin.get(tile);
+#endif
 	}
-	fin.close();
 
-	//for (int j = 0; j < mapSize.y; j++) {
-	//	for (int i = 0; i < mapSize.x; i++) {
-	//		std::cout << map[j * mapSize.x + i] << " ";
-	//	}
-	//	std::cout << std::endl;
-	//}
+	/*for (int i=0; i<mapSize.y; ++i)
+	{
+		for (int j=0; j<mapSize.x; ++j) {
+			cout << map[i*mapSize.x+j] << " ";
+		}
+		cout << endl;
+	}*/
+
+	fin.close();
 	
 	return true;
 }
@@ -157,63 +164,62 @@ void TileMap::prepareArrays(const glm::vec2 &minCoords, ShaderProgram &program)
 // Method collisionMoveDown also corrects Y coordinate if the box is
 // already intersecting a tile below.
 
-
-bool TileMap::collisionMoveLeft(const glm::ivec2 & pos, const glm::ivec2 & size) const
+bool TileMap::collisionMoveLeft(const glm::ivec2 &pos, const glm::ivec2 &size) const
 {
 	int x, y0, y1;
-
+	
 	x = pos.x / tileSize;
 	y0 = pos.y / tileSize;
 	y1 = (pos.y + size.y - 1) / tileSize;
 
-	for (int y = y0; y <= y1; y++)
+	for(int y=y0; y<=y1; y++)
 	{
 		int value = map[y * mapSize.x + x];
-		if (std::find(checkList.begin(), checkList.end(), value) == checkList.end())
+		if (std::find(checkList.begin(), checkList.end(), value) != checkList.end())
 			return true;
 	}
-
+	
 	return false;
 }
 
-bool TileMap::collisionMoveRight(const glm::ivec2 & pos, const glm::ivec2 & size) const
+bool TileMap::collisionMoveRight(const glm::ivec2 &pos, const glm::ivec2 &size) const
 {
 	int x, y0, y1;
-
+	
 	x = (pos.x + size.x - 1) / tileSize;
 	y0 = pos.y / tileSize;
 	y1 = (pos.y + size.y - 1) / tileSize;
-	for (int y = y0; y <= y1; y++)
+	for(int y=y0; y<=y1; y++)
 	{
 		int value = map[y * mapSize.x + x];
-		if (std::find(checkList.begin(), checkList.end(), value) == checkList.end())
+		if (std::find(checkList.begin(), checkList.end(), value) != checkList.end())
 			return true;
 	}
-
+	
 	return false;
 }
 
-bool TileMap::collisionMoveDown(const glm::ivec2 & pos, const glm::ivec2 & size, int* posY) const
+bool TileMap::collisionMoveDown(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY) const
 {
 	int x0, x1, y;
-
+	
 	x0 = pos.x / tileSize;
 	x1 = (pos.x + size.x - 1) / tileSize;
 	y = (pos.y + size.y - 1) / tileSize;
 
-	for (int x = x0; x <= x1; x++)
+	for(int x=x0; x<=x1; x++)
 	{
 		int value = map[y * mapSize.x + x];
 
-		if (std::find(checkList.begin(), checkList.end(), value) == checkList.end())
+		if (std::find(checkList.begin(), checkList.end(), value) != checkList.end())
 		{
-			if (*posY - tileSize * y + size.y <= 6)
+			if(*posY - tileSize * y + size.y <= 6)
 			{
 				*posY = tileSize * y - size.y;
 				return true;
 			}
 		}
 	}
-
+	
 	return false;
 }

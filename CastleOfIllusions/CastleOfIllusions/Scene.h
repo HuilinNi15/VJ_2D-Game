@@ -1,15 +1,20 @@
 #ifndef _SCENE_INCLUDE
 #define _SCENE_INCLUDE
 
-
 #include <glm/glm.hpp>
 #include "ShaderProgram.h"
 #include "TileMap.h"
 #include "Player.h"
 
+#define SCREEN_X 0
+#define SCREEN_Y 0
+
+#define INIT_PLAYER_X_TILES 1
+#define INIT_PLAYER_Y_TILES 6
 
 #define CAMERA_WIDTH 256
 #define CAMERA_HEIGHT 160
+
 #define DEAD_ZONE_SIZE 6.0f
 
 // Scene contains all the entities of our game.

@@ -5,13 +5,6 @@
 #include "Game.h"
 
 
-#define SCREEN_X 0
-#define SCREEN_Y 0
-
-#define INIT_PLAYER_X_TILES 4
-#define INIT_PLAYER_Y_TILES 6
-
-
 Scene::Scene()
 {
 	map = NULL;
@@ -30,7 +23,11 @@ Scene::~Scene()
 void Scene::init()
 {
 	initShaders();
-	map = TileMap::createTileMap("levels/level01.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+	// Forest practice map
+	map = TileMap::createTileMap("levels/forest_practice_map.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+	// Chocolate map
+	//map = TileMap::createTileMap("levels/chocolate_map.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+
 	player = new Player();
 	player->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 	player->setPosition(glm::vec2(INIT_PLAYER_X_TILES * map->getTileSize(), INIT_PLAYER_Y_TILES * map->getTileSize()));
