@@ -1,4 +1,0 @@
-﻿  Scene.cpp
-C:\Users\tomek\Documentos 2\VICTOR\UNIVERSIDAD\7o_CUADRI\VJ\S1-2\OpenGL_VS2015\2DGame\02-Bubble\02-Bubble\Scene.cpp(71,22): warning C4244: '=': conversión de 'int' a 'float'; posible pérdida de datos
-SOIL.lib(image_DXT.obj) : warning LNK4099: no se encontró PDB '' con 'SOIL.lib(image_DXT.obj)' o en ''; se vinculará el objeto sin tener en cuenta información de depuración
-  02-Bubble.vcxproj -> C:\Users\tomek\Documentos 2\VICTOR\UNIVERSIDAD\7o_CUADRI\VJ\S1-2\OpenGL_VS2015\2DGame\02-Bubble\Debug\02-Bubble.exe
