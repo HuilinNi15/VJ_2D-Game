@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="66" height="12" tilewidth="16" tileheight="16" infinite="0" nextlayerid="2" nextobjectid="1">
- <tileset firstgid="1" source="tiles_forest.tsx"/>
+ <tileset firstgid="1" source="../images/tiles_forest_practice_map.tsx"/>
  <layer id="1" name="Tile Layer 1" width="66" height="12">
   <data encoding="csv">
 17,19,20,19,20,7,8,19,20,27,28,27,28,25,26,25,15,16,25,26,0,25,26,25,26,27,28,27,28,19,20,15,16,19,20,27,28,19,20,27,28,27,28,25,26,25,26,0,0,25,26,0,25,15,16,26,25,26,25,26,0,0,25,26,0,17,
