@@ -47,12 +47,10 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 		sprite->setAnimationSpeed(JUMP_LEFT, 3);
 		sprite->addKeyframe(JUMP_LEFT, glm::vec2(x * 2.f, y * 3.f));
 		sprite->addKeyframe(JUMP_LEFT, glm::vec2(x * 3.f, y * 3.f));
-		//sprite->addKeyframe(JUMP_LEFT, glm::vec2(x * 4.f, y * 3.f));
 
 		sprite->setAnimationSpeed(JUMP_RIGHT, 3);
 		sprite->addKeyframe(JUMP_RIGHT, glm::vec2(x * 2.f, y * 2.f));
 		sprite->addKeyframe(JUMP_RIGHT, glm::vec2(x * 3.f, y * 2.f));
-		//sprite->addKeyframe(JUMP_RIGHT, glm::vec2(x * 4.f, y * 2.f));
 
 		sprite->setAnimationSpeed(STOP_LEFT, 2);
 		sprite->addKeyframe(STOP_LEFT, glm::vec2(x * 10.f, y * 1.f));
@@ -97,18 +95,18 @@ void Player::handleInputs(int deltaTime)
 	else
 	{
 		moving = false; 
-		stoping = true;
+		stopping = true;
 	}
 	handleJump();
 	handleCrouch(); 
 
-	if (stoping)
+	if (stopping)
 	{
 		velPlayer.x -= std::copysign(1.0f, velPlayer.x) * STOP_ACCELERATION* dt;
 		if (std::abs(velPlayer.x) < MIN_VELOCITY)
 		{
 			velPlayer.x = 0;
-			stoping = false; 
+			stopping = false; 
 		}
 	}
 
@@ -130,7 +128,6 @@ void Player::handleInputs(int deltaTime)
 	avgVelocity.y = (velStart.y + velPlayer.y) / 2.0f;
 	if (avgVelocity.y < MIN_FALL_VELOCITY && !jumping)
 		avgVelocity.y = MIN_FALL_VELOCITY;
-	std::cout << avgVelocity.y << std::endl; 
 	posPlayer.y += avgVelocity.y * dt;
 	if (map->collisionMoveDown(posPlayer, glm::ivec2(32, 32), &posPlayer.y))
 	{
@@ -146,7 +143,7 @@ void Player::handleInputs(int deltaTime)
 void Player::handleMove(float direction)
 {
 	moving = true;
-	stoping = false;
+	stopping = false;
 	facingRight = (direction == 1.0f);
 
 	if (!crouching)
@@ -156,13 +153,14 @@ void Player::handleMove(float direction)
 		else
 			velPlayer.x += direction * ACCELERATION * dt;
 
-		if (direction * velPlayer.x < 0) 
+		if (direction * velPlayer.x < 0) // When player changes directions
 		{
 			velPlayer.x += direction * STOP_ACCELERATION * dt;
 			if (std::abs(velPlayer.x) < MIN_VELOCITY) velPlayer.x = 0; 
 		}
+		// Vel must always be between (-100, -20) or (20, 100)
 		velPlayer.x = glm::clamp(velPlayer.x, -MAX_VELOCITY, MAX_VELOCITY);
-		if (std::abs(velPlayer.x) < MIN_VELOCITY) velPlayer.x = direction * MIN_VELOCITY;
+		if (std::abs(velPlayer.x) < MIN_VELOCITY) velPlayer.x = direction * MIN_VELOCITY; 
 	}
 }
 
@@ -186,7 +184,7 @@ void Player::handleCrouch()
 		if (!jumping)
 		{
 			crouching = true;
-			stoping = true;
+			stopping = true;
 			moving = false; 
 		}
 		else
@@ -195,7 +193,7 @@ void Player::handleCrouch()
 	else
 	{
 		crouching = false;
-		if (!moving) stoping = true;
+		if (!moving) stopping = true;
 	}
 }
 
@@ -211,7 +209,7 @@ void Player::changeAnimations(int deltaTime)
 {
 	sprite->update(deltaTime);
 
-	if (!moving && !stoping && !jumping && !crouching)
+	if (!moving && !stopping && !jumping && !crouching)
 	{
 		if (facingRight)
 			changeAnimation(STAND_RIGHT);
@@ -227,7 +225,7 @@ void Player::changeAnimations(int deltaTime)
 			changeAnimation(MOVE_LEFT);
 	}
 
-	else if (stoping && !jumping && !crouching)
+	else if (stopping && !jumping && !crouching)
 	{
 		if (facingRight)
 			changeAnimation(STOP_RIGHT);

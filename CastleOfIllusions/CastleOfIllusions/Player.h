@@ -6,14 +6,15 @@
 #include "TileMap.h"
 
 
-const float MIN_VELOCITY = 20.0f;
-const float MAX_VELOCITY = 100.0f;
-const float ACCELERATION = 120.0f;
-const float JUMP_ACCELERATION = 100.0f; 
-const float STOP_ACCELERATION = 120.0f;
-const float GRAVITY = 500.0f;
-const float MIN_FALL_VELOCITY = 70.0f; 
-const float JUMP_VELOCITY = 245.0;
+const float MIN_VELOCITY = 20.0f; // Min vel when player moves horizontally
+const float MAX_VELOCITY = 100.0f; // Max vel when player moves horizontally
+const float ACCELERATION = 120.0f; // Horizontal acceleration
+const float JUMP_ACCELERATION = 100.0f; // Horizontal acceleration while jumping
+const float STOP_ACCELERATION = 120.0f; // Horizontal deceleration
+const float GRAVITY = 500.0f; // Determined gravity for our world
+const float MIN_FALL_VELOCITY = 70.0f; // Min falling vel 
+const float JUMP_VELOCITY = 245.0f; // Initial vel when jumping
+
 
 enum PlayerAnims
 {
@@ -54,15 +55,15 @@ private:
 	Sprite *sprite;
 	TileMap *map;
 
-	glm::vec2 posPlayer, velPlayer, avgVelocity, collisionBox;
+	glm::vec2 posPlayer, velPlayer, avgVelocity, hitBox;
 	float dt; 
-	bool facingRight = true; 
-	bool moving = false; 
-	bool stoping = false; 
-	bool jumping = false; 
-	bool attacking = false; 
-	bool crouching = false; 
-	bool pressedAgain = false; 
+	bool facingRight = true; // if false, then facingLeft
+	bool moving = false; // if true, player is moving horizontally (A or D key)
+	bool stopping = false; // if true, player is slowing down horizontally
+	bool jumping = false; // if true, player is jumping
+	bool attacking = false; // if true, player attacking while jumping
+	bool crouching = false; // if true, player is crouched down
+	bool pressedAgain = false; // 
 };
 
 
