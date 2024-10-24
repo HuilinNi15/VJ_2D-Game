@@ -13,7 +13,7 @@
 #define INIT_PLAYER_Y_TILES 6
 
 #define CAMERA_WIDTH 256
-#define CAMERA_HEIGHT 160
+#define CAMERA_HEIGHT 192
 
 #define DEAD_ZONE_SIZE 6.0f
 

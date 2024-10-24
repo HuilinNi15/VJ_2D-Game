@@ -83,6 +83,14 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 }
 
 
+glm::vec2 Player::addOffset(glm::vec2 pos, glm::vec2 boxOffset)
+{
+	pos.x += boxOffset.x;
+	pos.y += boxOffset.y;
+	return pos;
+}
+
+
 void Player::handleInputs(int deltaTime)
 {
 	dt = deltaTime / 1000.0f;
@@ -115,9 +123,9 @@ void Player::handleInputs(int deltaTime)
 
 	bool collisionDetected = false;
 	if (velPlayer.x > 0.0f)
-		collisionDetected = map->collisionMoveRight(posPlayer, glm::vec2(32, 32));
+		collisionDetected = map->collisionMoveRight(addOffset(posPlayer, hitBoxOffset), hitBox);
 	else if (velPlayer.x < 0.0f)
-		collisionDetected = map->collisionMoveLeft(posPlayer, glm::vec2(32, 32));
+		collisionDetected = map->collisionMoveLeft(addOffset(posPlayer, hitBoxOffset), hitBox);
 	if (collisionDetected)
 	{
 		posPlayer.x -= avgVelocity.x * dt;
@@ -129,12 +137,14 @@ void Player::handleInputs(int deltaTime)
 	if (avgVelocity.y < MIN_FALL_VELOCITY && !jumping)
 		avgVelocity.y = MIN_FALL_VELOCITY;
 	posPlayer.y += avgVelocity.y * dt;
-	if (map->collisionMoveDown(posPlayer, glm::ivec2(32, 32), &posPlayer.y))
+	if (map->collisionMoveDown(addOffset(posPlayer, hitBoxOffset), hitBox, &posPlayer.y))
 	{
 		velPlayer.y = 0.0f;
 		jumping = false;
 		attacking = false;
 	}
+	else
+		jumping = true; 
 
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
 }
