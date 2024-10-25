@@ -14,7 +14,7 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 	float x = 0.0625; 
 	float y = 0.125; 
 	sprite = Sprite::createSprite(glm::ivec2(32, 32), glm::vec2(x, y), &spritesheet, &shaderProgram);
-	sprite->setNumberAnimations(12);
+	sprite->setNumberAnimations(14);
 	
 		sprite->setAnimationSpeed(STAND_LEFT, 2);
 		sprite->addKeyframe(STAND_LEFT, glm::vec2(x * 0.f, y * 1.f));
@@ -67,6 +67,14 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 		sprite->addKeyframe(BUTT_ATTACK_RIGHT, glm::vec2(x * 5.0f, y * 2.0f));
 		sprite->addKeyframe(BUTT_ATTACK_RIGHT, glm::vec2(x * 6.0f, y * 2.0f));
 		sprite->addKeyframe(BUTT_ATTACK_RIGHT, glm::vec2(x * 7.0f, y * 2.0f));
+
+		sprite->setAnimationSpeed(BUTT_FALL_LEFT, 4);
+		sprite->addKeyframe(BUTT_FALL_LEFT, glm::vec2(x * 7.0f, y * 3.0f));
+		sprite->addKeyframe(BUTT_FALL_LEFT, glm::vec2(x * 8.0f, y * 3.0f));
+
+		sprite->setAnimationSpeed(BUTT_FALL_RIGHT, 4);
+		sprite->addKeyframe(BUTT_FALL_RIGHT, glm::vec2(x * 7.0f, y * 2.0f));
+		sprite->addKeyframe(BUTT_FALL_RIGHT, glm::vec2(x * 8.0f, y * 2.0f));
 
 		sprite->setAnimationSpeed(CROUCH_DOWN_LEFT, 4);
 		sprite->addKeyframe(CROUCH_DOWN_LEFT, glm::vec2(x * 0.f, y * 3.f));
