@@ -219,7 +219,7 @@ bool TileMap::collisionMoveDown(const glm::vec2& pos, const glm::ivec2& size, fl
 
 		if (std::find(checkList.begin(), checkList.end(), value) != checkList.end())
 		{
-			if (*posY - tileSize * y + size.y <= 6)
+			if (*posY - tileSize * y + size.y <= 8)
 			{
 				*posY = tileSize * y - size.y;
 				return true;

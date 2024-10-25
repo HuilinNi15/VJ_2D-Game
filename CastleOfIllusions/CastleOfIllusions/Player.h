@@ -43,6 +43,7 @@ public:
 	glm::ivec2 getPosition() const { return posPlayer; };
 	
 private:
+	glm::vec2 Player::addOffset(glm::vec2 pos, glm::vec2 box);
 	void handleMove(float direction);
 	void handleJump();
 	void handleCrouch();
@@ -56,7 +57,9 @@ private:
 	Sprite *sprite;
 	TileMap *map;
 
-	glm::vec2 posPlayer, velPlayer, avgVelocity, hitBox;
+	glm::vec2 posPlayer, velPlayer, avgVelocity;
+	glm::ivec2 hitBox = glm::ivec2(18, 32);
+	glm::vec2 hitBoxOffset = glm::vec2(7, 0);
 	float dt; 
 	bool facingRight = true; // if false, then facingLeft
 	bool moving = false; // if true, player is moving horizontally (A or D key)
