@@ -91,14 +91,6 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 }
 
 
-glm::vec2 Player::addOffset(glm::vec2 pos, glm::vec2 boxOffset)
-{
-	pos.x += boxOffset.x;
-	pos.y += boxOffset.y;
-	return pos;
-}
-
-
 void Player::handleInputs(int deltaTime)
 {
 	dt = deltaTime / 1000.0f;
@@ -131,9 +123,9 @@ void Player::handleInputs(int deltaTime)
 
 	bool collisionDetected = false;
 	if (velPlayer.x > 0.0f)
-		collisionDetected = map->collisionMoveRight(addOffset(posPlayer, hitBoxOffset), hitBox);
+		collisionDetected = map->collisionMoveRight(posPlayer, hitBox, hitBoxOffset);
 	else if (velPlayer.x < 0.0f)
-		collisionDetected = map->collisionMoveLeft(addOffset(posPlayer, hitBoxOffset), hitBox);
+		collisionDetected = map->collisionMoveLeft(posPlayer, hitBox, hitBoxOffset);
 	if (collisionDetected)
 	{
 		posPlayer.x -= avgVelocity.x * dt;
@@ -145,7 +137,7 @@ void Player::handleInputs(int deltaTime)
 	if (avgVelocity.y < MIN_FALL_VELOCITY && !jumping)
 		avgVelocity.y = MIN_FALL_VELOCITY;
 	posPlayer.y += avgVelocity.y * dt;
-	if (map->collisionMoveDown(addOffset(posPlayer, hitBoxOffset), hitBox, &posPlayer.y))
+	if (map->collisionMoveDown(posPlayer, hitBox, hitBoxOffset, &posPlayer.y))
 	{
 		velPlayer.y = 0.0f;
 		jumping = false;
@@ -207,9 +199,14 @@ void Player::handleCrouch()
 		}
 		else
 			attacking = true; 
+
+		hitBox = glm::ivec2(18, 18);
+		hitBoxOffset = glm::ivec2(7, 13);
 	}
 	else
 	{
+		hitBox = glm::ivec2(18, 30);
+		hitBoxOffset = glm::ivec2(7, 1);
 		crouching = false;
 		if (!moving) stopping = true;
 	}

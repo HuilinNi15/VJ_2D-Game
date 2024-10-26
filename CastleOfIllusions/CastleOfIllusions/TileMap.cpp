@@ -164,11 +164,20 @@ void TileMap::prepareArrays(const glm::vec2& minCoords, ShaderProgram& program)
 // Method collisionMoveDown also corrects Y coordinate if the box is
 // already intersecting a tile below.
 
-bool TileMap::collisionMoveLeft(const glm::vec2& pos, const glm::ivec2& size) const
+
+glm::ivec2 TileMap::addOffset(glm::ivec2 pos, const glm::ivec2& boxOffset) const
+{
+	pos.x += boxOffset.x;
+	pos.y += boxOffset.y;
+	return pos;
+}
+
+
+bool TileMap::collisionMoveLeft(const glm::vec2& pos, const glm::ivec2& size, const glm::ivec2& offset) const
 {
 	int x, y0, y1;
 
-	glm::ivec2 intPos = glm::ivec2(pos);
+	glm::ivec2 intPos = addOffset(glm::ivec2(pos), offset);
 
 	x = intPos.x / tileSize;
 	y0 = intPos.y / tileSize;
@@ -184,11 +193,11 @@ bool TileMap::collisionMoveLeft(const glm::vec2& pos, const glm::ivec2& size) co
 	return false;
 }
 
-bool TileMap::collisionMoveRight(const glm::vec2& pos, const glm::ivec2& size) const
+bool TileMap::collisionMoveRight(const glm::vec2& pos, const glm::ivec2& size, const glm::ivec2& offset) const
 {
 	int x, y0, y1;
 
-	glm::ivec2 intPos = glm::ivec2(pos);
+	glm::ivec2 intPos = addOffset(glm::ivec2(pos), offset);
 
 	x = (intPos.x + size.x - 1) / tileSize;
 	y0 = intPos.y / tileSize;
@@ -203,11 +212,11 @@ bool TileMap::collisionMoveRight(const glm::vec2& pos, const glm::ivec2& size) c
 	return false;
 }
 
-bool TileMap::collisionMoveDown(const glm::vec2& pos, const glm::ivec2& size, float* posY) const
+bool TileMap::collisionMoveDown(const glm::vec2& pos, const glm::ivec2& size, const glm::ivec2& offset, float* posY) const
 {
 	int x0, x1, y;
 
-	glm::ivec2 intPos = glm::ivec2(pos);
+	glm::ivec2 intPos = addOffset(glm::ivec2(pos), offset);
 
 	x0 = intPos.x / tileSize;
 	x1 = (intPos.x + size.x - 1) / tileSize;
@@ -221,7 +230,7 @@ bool TileMap::collisionMoveDown(const glm::vec2& pos, const glm::ivec2& size, fl
 		{
 			if (*posY - tileSize * y + size.y <= 8)
 			{
-				*posY = tileSize * y - size.y;
+				*posY = tileSize * y - size.y - offset.y;
 				return true;
 			}
 		}

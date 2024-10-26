@@ -34,9 +34,10 @@ public:
 	glm::ivec2 getMapSize() const { return mapSize; }
 	glm::ivec2 getMapPixelSize() const { return mapPixelSize; }
 
-	bool collisionMoveLeft(const glm::vec2& pos, const glm::ivec2& size) const;
-	bool collisionMoveRight(const glm::vec2& pos, const glm::ivec2& size) const;
-	bool collisionMoveDown(const glm::vec2& pos, const glm::ivec2& size, float* posY) const;
+	glm::ivec2 TileMap::addOffset(glm::ivec2 pos, const glm::ivec2& boxOffset) const;
+	bool collisionMoveLeft(const glm::vec2& pos, const glm::ivec2& size, const glm::ivec2& offset) const;
+	bool collisionMoveRight(const glm::vec2& pos, const glm::ivec2& size, const glm::ivec2& offset) const;
+	bool collisionMoveDown(const glm::vec2& pos, const glm::ivec2& size, const glm::ivec2& offset, float* posY) const;
 
 private:
 	bool loadLevel(const string& levelFile);
@@ -51,7 +52,7 @@ private:
 	int tileSize, blockSize;
 	Texture tilesheet;
 	glm::vec2 tileTexSize;
-	int* map;
+	int* map, decoration, background, sprites;
 
 	//std::vector<int> checkList = {8, 9, 10, 11, 12, 24, 25, 27, 40, 41, 42}; 
 							/*{0, 1, 2, 3, 4, 5, 6, 7, 17, 18, 19, 20, 21, 22, 23,
