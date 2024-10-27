@@ -10,12 +10,12 @@
 #define SCREEN_Y 0
 
 #define INIT_PLAYER_X_TILES 1
-#define INIT_PLAYER_Y_TILES 6
+#define INIT_PLAYER_Y_TILES 5
 
 #define CAMERA_WIDTH 256
 #define CAMERA_HEIGHT 192
 
-#define DEAD_ZONE_SIZE 6.0f
+#define DEAD_ZONE_SIZE 4.0f
 
 // Scene contains all the entities of our game.
 // It is responsible for updating and render them.

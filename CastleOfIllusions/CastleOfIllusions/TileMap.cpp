@@ -84,7 +84,6 @@ bool TileMap::loadLevel(const string& levelFile)
 	for (int j = 0; j < mapSize.y; j++)
 	{
 		getline(fin, line);
-		//cout << line << endl;
 		stringstream ss(line);
 		int tile;
 
