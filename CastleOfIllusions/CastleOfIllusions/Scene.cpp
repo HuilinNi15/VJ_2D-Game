@@ -38,7 +38,7 @@ void Scene::init()
 
 void Scene::updateCam(int deltaTime)
 {
-	float deltaTimeSec = deltaTime / 1000.0f;
+	float deltaTimeSec = (float)deltaTime / 1000.0f;
 	glm::ivec2 posPlayer = player->getPosition();
 
 	glm::ivec2 mapPixelSize = map->getMapPixelSize();

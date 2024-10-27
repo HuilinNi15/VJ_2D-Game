@@ -3,7 +3,6 @@
 #include <GL/glew.h>
 #include "Player.h"
 #include "Game.h"
-#include "Object.h"
 
 
 
@@ -18,26 +17,25 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 
 	animations.resize(14);
 
-	addAnimation(STAND_LEFT, glm::ivec2(18, 30), glm::vec2(7, 18));
-	addAnimation(STAND_RIGHT, glm::ivec2(18, 30), glm::vec2(7, 18));
-	addAnimation(MOVE_LEFT, glm::ivec2(20, 30), glm::vec2(6, 18));
-	addAnimation(MOVE_RIGHT, glm::ivec2(20, 30), glm::vec2(6, 18));
-	addAnimation(JUMP_LEFT, glm::ivec2(20, 31), glm::vec2(6, 17));
-	addAnimation(JUMP_RIGHT, glm::ivec2(20, 31), glm::vec2(6, 17));
-	addAnimation(BUTT_ATTACK_LEFT, glm::ivec2(20, 25), glm::vec2(6, 22));
-	addAnimation(BUTT_ATTACK_RIGHT, glm::ivec2(20, 25), glm::vec2(6, 22));
-	addAnimation(BUTT_FALL_LEFT, glm::ivec2(20, 23), glm::vec2(6, 25));
-	addAnimation(BUTT_FALL_RIGHT, glm::ivec2(20, 23), glm::vec2(6, 25));
-	addAnimation(STOP_RIGHT, glm::ivec2(20, 28), glm::vec2(6, 20));
-	addAnimation(STOP_LEFT, glm::ivec2(20, 28), glm::vec2(6, 20));
-	addAnimation(CROUCH_DOWN_LEFT, glm::ivec2(18, 20), glm::vec2(7, 28));
-	addAnimation(CROUCH_DOWN_RIGHT, glm::ivec2(18, 20), glm::vec2(7, 28));
+	size = glm::ivec2(32, 48);
 
-	sprite = Sprite::createSprite(glm::ivec2(32, 48), glm::vec2(x, y), &spritesheet, &shaderProgram);
+	addAnimation(STAND_LEFT, size, glm::ivec2(18, 30), glm::ivec2(7, 18));
+	addAnimation(STAND_RIGHT, size, glm::ivec2(18, 30), glm::ivec2(7, 18));
+	addAnimation(MOVE_LEFT, size, glm::ivec2(20, 30), glm::ivec2(6, 18));
+	addAnimation(MOVE_RIGHT, size, glm::ivec2(20, 30), glm::ivec2(6, 18));
+	addAnimation(JUMP_LEFT, size, glm::ivec2(20, 31), glm::ivec2(6, 17));
+	addAnimation(JUMP_RIGHT, size, glm::ivec2(20, 31), glm::ivec2(6, 17));
+	addAnimation(BUTT_ATTACK_LEFT, size, glm::ivec2(20, 26), glm::ivec2(6, 22));
+	addAnimation(BUTT_ATTACK_RIGHT, size, glm::ivec2(20, 26), glm::ivec2(6, 22));
+	addAnimation(BUTT_FALL_LEFT, size, glm::ivec2(20, 23), glm::ivec2(6, 25));
+	addAnimation(BUTT_FALL_RIGHT, size, glm::ivec2(20, 23), glm::ivec2(6, 25));
+	addAnimation(STOP_RIGHT, size, glm::ivec2(20, 28), glm::ivec2(6, 20));
+	addAnimation(STOP_LEFT, size, glm::ivec2(20, 28), glm::ivec2(6, 20));
+	addAnimation(CROUCH_DOWN_LEFT, size, glm::ivec2(18, 20), glm::ivec2(7, 28));
+	addAnimation(CROUCH_DOWN_RIGHT, size, glm::ivec2(18, 20), glm::ivec2(7, 28));
+
+	sprite = Sprite::createSprite(size, glm::vec2(x, y), &spritesheet, &shaderProgram);
 	sprite->setNumberAnimations(animations.size());
-
-	/*sprite = Sprite::createSprite(glm::ivec2(32, 48), glm::vec2(x, y), &spritesheet, &shaderProgram);
-	sprite->setNumberAnimations(14);*/
 	
 		sprite->setAnimationSpeed(STAND_LEFT, 2);
 		sprite->addKeyframe(STAND_LEFT, glm::vec2(x * 0.f, y * 1.f));
@@ -107,34 +105,17 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 		sprite->addKeyframe(CROUCH_DOWN_RIGHT, glm::vec2(x * 0.f, y * 2.f));
 		sprite->addKeyframe(CROUCH_DOWN_RIGHT, glm::vec2(x * 1.f, y * 2.f));
 
-	/*glm::vec2 initialPosition = glm::vec2(float(tileMapDispl.x + posPlayer.x + hitBoxOffset.x), 
-											float(tileMapDispl.y + posPlayer.y - hitBox.y + hitBoxOffset.y));
-	sprite->setPosition(initialPosition);*/
-
-	//sprite->changeAnimation(0);
 	tileMapDispl = tileMapPos;
-	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
-	//sprite->setPosition(glm::vec2(float(tileMapDispl.x), float(tileMapDispl.y)));
+	sprite->setPosition(glm::vec2(float(tileMapDispl.x + pos.x), float(tileMapDispl.y + pos.y)));
+
+	isStatic = false; 
+	updateHitBox(STAND_RIGHT);
 }
 
 
-void Player::addAnimation(int animId, const glm::ivec2& hitBox, const glm::vec2& hitBoxOffset)
-{
-	animations[animId] = { hitBox, hitBoxOffset };
-}
-
-
-void Player::updateHitBox(int animId)
-{
-	hitBox = animations[animId].hitBox;
-	hitBoxOffset = animations[animId].hitBoxOffset;
-}
-
-
-void Player::handleInputs(int deltaTime)
+void Player::calculateVelocity(int deltaTime)
 {
 	dt = deltaTime / 1000.0f;
-	glm::vec2 velStart = velPlayer;
 
 	if (Game::instance().getKey(GLFW_KEY_A))
 		handleMove(-1.0f);
@@ -150,47 +131,13 @@ void Player::handleInputs(int deltaTime)
 
 	if (stopping)
 	{
-		velPlayer.x -= std::copysign(1.0f, velPlayer.x) * STOP_ACCELERATION* dt;
-		if (std::abs(velPlayer.x) < MIN_VELOCITY)
+		vel.x -= std::copysign(1.0f, vel.x) * STOP_ACCELERATION* dt;
+		if (std::abs(vel.x) < MIN_VELOCITY)
 		{
-			velPlayer.x = 0;
+			vel.x = 0;
 			stopping = false; 
 		}
 	}
-
-	//updateHitBox();
-	//changeAnimations(deltaTime);
-
-	avgVelocity.x = (velStart.x + velPlayer.x) / 2.0f;
-	posPlayer.x += avgVelocity.x * dt;
-
-	bool collisionDetected = false;
-	if (velPlayer.x > 0.0f)
-		collisionDetected = map->collisionMoveRight(posPlayer, hitBox, hitBoxOffset);
-	else if (velPlayer.x < 0.0f)
-		collisionDetected = map->collisionMoveLeft(posPlayer, hitBox, hitBoxOffset);
-	if (collisionDetected)
-	{
-		posPlayer.x -= avgVelocity.x * dt;
-		velPlayer.x = 0.0f;
-	}
-
-	velPlayer.y += GRAVITY * dt;
-	avgVelocity.y = (velStart.y + velPlayer.y) / 2.0f;
-	if (avgVelocity.y < MIN_FALL_VELOCITY && !jumping)
-		avgVelocity.y = MIN_FALL_VELOCITY;
-	posPlayer.y += avgVelocity.y * dt;
-	if (map->collisionMoveDown(posPlayer, hitBox, hitBoxOffset, &posPlayer.y))
-	{
-		velPlayer.y = 0.0f;
-		jumping = false;
-		attacking = false;
-	}
-	else
-		jumping = true; 
-
-	changeAnimations(deltaTime);
-	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
 }
 
 
@@ -202,31 +149,31 @@ void Player::handleMove(float direction)
 
 	if (!crouching)
 	{
-		if (jumping)
-			velPlayer.x += direction * JUMP_ACCELERATION * dt;
+		if (falling)
+			vel.x += direction * JUMP_ACCELERATION * dt;
 		else
-			velPlayer.x += direction * ACCELERATION * dt;
+			vel.x += direction * ACCELERATION * dt;
 
-		if (direction * velPlayer.x < 0) // When player changes directions
+		if (direction * vel.x < 0) // When player changes directions
 		{
-			velPlayer.x += direction * STOP_ACCELERATION * dt;
-			if (std::abs(velPlayer.x) < MIN_VELOCITY) velPlayer.x = 0; 
+			vel.x += direction * STOP_ACCELERATION * dt;
+			if (std::abs(vel.x) < MIN_VELOCITY) vel.x = 0; 
 		}
 		// Vel must always be between (-100, -20) or (20, 100)
-		velPlayer.x = glm::clamp(velPlayer.x, -MAX_VELOCITY, MAX_VELOCITY);
-		if (std::abs(velPlayer.x) < MIN_VELOCITY) velPlayer.x = direction * MIN_VELOCITY; 
+		vel.x = glm::clamp(vel.x, -MAX_VELOCITY, MAX_VELOCITY);
+		if (std::abs(vel.x) < MIN_VELOCITY) vel.x = direction * MIN_VELOCITY; 
 	}
 }
 
 
 void Player::handleJump()
 {
-	if (Game::instance().getKey(GLFW_KEY_W) && !jumping)
+	if (Game::instance().getKey(GLFW_KEY_W) && !falling)
 	{
-		jumping = true;
+		falling = true;
 		crouching = false; 
 
-		velPlayer.y = -JUMP_VELOCITY;
+		vel.y = -JUMP_VELOCITY;
 	}
 }
 
@@ -235,7 +182,7 @@ void Player::handleCrouch()
 {
 	if (Game::instance().getKey(GLFW_KEY_S))
 	{
-		if (!jumping)
+		if (!falling)
 		{
 			crouching = true;
 			stopping = true;
@@ -243,17 +190,19 @@ void Player::handleCrouch()
 		}
 		else
 			attacking = true; 
-
-		hitBox = glm::ivec2(18, 19);
-		hitBoxOffset = glm::ivec2(7, 28);
 	}
 	else
 	{
-		hitBox = glm::ivec2(18, 29);
-		hitBoxOffset = glm::ivec2(7, 18);
 		crouching = false;
 		if (!moving) stopping = true;
 	}
+}
+
+
+void Player::otherChanges()
+{
+	if (verticalCollision)
+		attacking = false; 
 }
 
 
@@ -268,7 +217,7 @@ void Player::changeAnimations(int deltaTime)
 {
 	sprite->update(deltaTime);
 
-	if (!moving && !stopping && !jumping && !crouching)
+	if (!moving && !stopping && !falling && !crouching)
 	{
 		if (facingRight) {
 			changeAnimation(STAND_RIGHT);
@@ -280,7 +229,7 @@ void Player::changeAnimations(int deltaTime)
 		}
 	}
 
-	else if (moving && !jumping)
+	else if (moving && !falling)
 	{
 		if (facingRight) {
 			changeAnimation(MOVE_RIGHT);
@@ -293,7 +242,7 @@ void Player::changeAnimations(int deltaTime)
 		}	
 	}
 
-	else if (stopping && !jumping && !crouching)
+	else if (stopping && !falling && !crouching)
 	{
 		if (facingRight) {
 			changeAnimation(STOP_RIGHT);
@@ -317,7 +266,7 @@ void Player::changeAnimations(int deltaTime)
 		}
 	}
 
-	else if (jumping && !attacking)
+	else if (falling && !attacking)
 	{
 		if (facingRight) {
 			changeAnimation(JUMP_RIGHT);
@@ -329,7 +278,7 @@ void Player::changeAnimations(int deltaTime)
 		}
 	}
 
-	else if (jumping && attacking)
+	else if (falling && attacking)
 	{
 		if (facingRight) {
 			changeAnimation(BUTT_ATTACK_RIGHT);
@@ -340,26 +289,4 @@ void Player::changeAnimations(int deltaTime)
 			updateHitBox(BUTT_ATTACK_LEFT);
 		}
 	}
-}
-
-
-void Player::update(int deltaTime)
-{
-	handleInputs(deltaTime);
-}
-
-void Player::render()
-{
-	sprite->render();
-}
-
-void Player::setTileMap(TileMap *tileMap)
-{
-	map = tileMap;
-}
-
-void Player::setPosition(const glm::vec2 &pos)
-{
-	posPlayer = pos;
-	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
 }
