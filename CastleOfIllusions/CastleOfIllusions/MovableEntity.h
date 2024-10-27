@@ -1,5 +1,5 @@
-#ifndef _OBJECT_INCLUDE
-#define _OBJECT_INCLUDE
+#ifndef _MOVABLE_ENTITY_INCLUDE
+#define _MOVABLE_ENTITY_INCLUDE
 
 
 #include "Sprite.h"
@@ -11,7 +11,7 @@ const float MIN_FALL_VELOCITY = 70.0f; // Min falling vel
 
 
 #pragma once
-class Object
+class MovableEntity
 {
 public:
 	virtual void init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) = 0;

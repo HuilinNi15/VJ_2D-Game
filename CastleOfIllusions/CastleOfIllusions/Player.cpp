@@ -1,7 +1,7 @@
 #include <cmath>
 #include <iostream>
 #include <GL/glew.h>
-#include "Player.h"
+#include "MovableEntity.h"
 #include "Game.h"
 
 

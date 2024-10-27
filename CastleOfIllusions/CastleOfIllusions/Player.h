@@ -4,7 +4,7 @@
 
 #include "Sprite.h"
 #include "TileMap.h"
-#include "Object.h"
+#include "MovableEntity.h"
 
 
 const float MIN_VELOCITY = 20.0f; // Min vel when player moves horizontally
@@ -29,7 +29,7 @@ enum PlayerAnims
 // all properties it needs to track its movement, jumping, and collisions.
 
 
-class Player: public Object
+class Player: public MovableEntity
 {
 
 public:

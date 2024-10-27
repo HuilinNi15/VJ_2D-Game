@@ -1,24 +1,24 @@
-#include "Object.h"
+#include "MovableEntity.h"
 #include "Game.h"
 #include <iostream>
 #include <GL/glew.h>
 
 
 
-void Object::addAnimation(int animId, const glm::ivec2& size, const glm::ivec2& hitBox, const glm::ivec2& hitBoxOffset)
+void MovableEntity::addAnimation(int animId, const glm::ivec2& size, const glm::ivec2& hitBox, const glm::ivec2& hitBoxOffset)
 {
 	animations[animId] = { size, hitBox, hitBoxOffset };
 }
 
 
-void Object::updateHitBox(int animId)
+void MovableEntity::updateHitBox(int animId)
 {
 	hitBox = animations[animId].hitBox;
 	hitBoxOffset = animations[animId].hitBoxOffset;
 }
 
 
-void Object::update(int deltaTime)
+void MovableEntity::update(int deltaTime)
 {
 	glm::vec2 velStart = vel;
 
@@ -32,17 +32,17 @@ void Object::update(int deltaTime)
 }
 
 
-void Object::calculateVelocity(int deltaTime)
+void MovableEntity::calculateVelocity(int deltaTime)
 {
 }
 
 
-void Object::otherChanges()
+void MovableEntity::otherChanges()
 {
 }
 
 
-void Object::recalculatePos(const glm::vec2& velStart)
+void MovableEntity::recalculatePos(const glm::vec2& velStart)
 {
 	avgVel.x = (velStart.x + vel.x) / 2.0f;
 	pos.x += avgVel.x * dt;
@@ -79,17 +79,17 @@ void Object::recalculatePos(const glm::vec2& velStart)
 
 
 
-void Object::render()
+void MovableEntity::render()
 {
 	sprite->render();
 }
 
-void Object::setTileMap(TileMap* tileMap)
+void MovableEntity::setTileMap(TileMap* tileMap)
 {
 	map = tileMap;
 }
 
-void Object::setPosition(const glm::vec2& position)
+void MovableEntity::setPosition(const glm::vec2& position)
 {
 	pos = position;
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + pos.x), float(tileMapDispl.y + pos.y)));
