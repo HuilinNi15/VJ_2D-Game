@@ -3,6 +3,7 @@
 #include <GL/glew.h>
 #include "Player.h"
 #include "Game.h"
+#include "Object.h"
 
 
 

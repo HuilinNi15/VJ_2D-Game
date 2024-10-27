@@ -4,6 +4,7 @@
 
 #include "Sprite.h"
 #include "TileMap.h"
+#include "Object.h"
 
 
 const float MIN_VELOCITY = 20.0f; // Min vel when player moves horizontally
@@ -11,7 +12,6 @@ const float MAX_VELOCITY = 100.0f; // Max vel when player moves horizontally
 const float ACCELERATION = 120.0f; // Horizontal acceleration
 const float JUMP_ACCELERATION = 100.0f; // Horizontal acceleration while jumping
 const float STOP_ACCELERATION = 120.0f; // Horizontal deceleration
-const float GRAVITY = 500.0f; // Determined gravity for our world
 const float MIN_FALL_VELOCITY = 70.0f; // Min falling vel 
 const float JUMP_VELOCITY = 245.0f; // Initial vel when jumping
 
