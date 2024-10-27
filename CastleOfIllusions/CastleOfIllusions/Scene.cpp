@@ -45,11 +45,11 @@ void Scene::updateCam(int deltaTime)
 	int mapWidth = mapPixelSize.x;
 	int mapHeight = mapPixelSize.y;
 
-	float deadZoneWidth = CAMERA_WIDTH / DEAD_ZONE_SIZE; 
+	float deadZoneWidth = CAMERA_WIDTH / DEAD_ZONE_SIZE;
 
 	// Define the dead zone boundaries
-	float deadZoneLeft = cameraX + (CAMERA_WIDTH - deadZoneWidth) / 2.0f;
-	float deadZoneRight = cameraX + (CAMERA_WIDTH + deadZoneWidth) / 2.0f;
+	float deadZoneLeft = cameraX-16 + (CAMERA_WIDTH - deadZoneWidth) / 2.0f;
+	float deadZoneRight = cameraX-16 + (CAMERA_WIDTH + deadZoneWidth) / 2.0f;
 
 	// Check if the player is outside the dead zone (horizontally)
 	if (posPlayer.x < deadZoneLeft)
