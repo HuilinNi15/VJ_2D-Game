@@ -18,11 +18,11 @@ const float JUMP_VELOCITY = 245.0f; // Initial vel when jumping
 
 enum PlayerAnims
 {
-	STAND_LEFT, STAND_RIGHT, MOVE_LEFT, MOVE_RIGHT,
-	JUMP_LEFT, JUMP_RIGHT, 
-	BUTT_ATTACK_LEFT, BUTT_ATTACK_RIGHT, BUTT_FALL_LEFT, BUTT_FALL_RIGHT,
-	STOP_RIGHT, STOP_LEFT,
-	CROUCH_DOWN_LEFT, CROUCH_DOWN_RIGHT,
+	STAND_LEFT, STAND_RIGHT, MOVE_LEFT, MOVE_RIGHT, // 0, 1, 2, 3
+	JUMP_LEFT, JUMP_RIGHT, // 4, 5
+	BUTT_ATTACK_LEFT, BUTT_ATTACK_RIGHT, BUTT_FALL_LEFT, BUTT_FALL_RIGHT, // 6, 7, 8, 9
+	STOP_RIGHT, STOP_LEFT, // 10, 11
+	CROUCH_DOWN_LEFT, CROUCH_DOWN_RIGHT // 12, 13
 };
 
 
@@ -41,8 +41,22 @@ public:
 	void setTileMap(TileMap *tileMap);
 	void setPosition(const glm::vec2 &pos);
 	glm::ivec2 getPosition() const { return posPlayer; };
+
+	glm::vec2 addOffset(glm::vec2 pos, glm::vec2 boxOffset);
+	void updateHitBox(int animId); // update hitbox based on current animation
 	
 private:
+	void addAnimation(int animId, const glm::ivec2& hitBox, const glm::vec2& hitBoxOffset);
+
+	struct AnimationData {
+		glm::ivec2 size;
+		glm::ivec2 hitBox;
+		glm::vec2 hitBoxOffset;
+	};
+
+	std::vector<AnimationData> animations; // store sizes and hitboxes for animations
+	int currentAnimation = 1; 
+
 	void handleMove(float direction);
 	void handleJump();
 	void handleCrouch();
@@ -57,8 +71,10 @@ private:
 	TileMap *map;
 
 	glm::vec2 posPlayer, velPlayer, avgVelocity;
+	glm::ivec2 size; 
 	glm::ivec2 hitBox = glm::ivec2(18, 30);
-	glm::ivec2 hitBoxOffset = glm::ivec2(7, 1);
+	glm::vec2 hitBoxOffset = glm::vec2(7, 18);
+
 	float dt; 
 	bool facingRight = true; // if false, then facingLeft
 	bool moving = false; // if true, player is moving horizontally (A or D key)

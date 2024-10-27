@@ -12,16 +12,38 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 	spritesheet.loadFromFile("images/mickey.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	spritesheet.setMinFilter(GL_NEAREST);
 	spritesheet.setMagFilter(GL_NEAREST);
+
 	float x = 0.0625; 
-	float y = 0.125; 
-	sprite = Sprite::createSprite(glm::ivec2(32, 32), glm::vec2(x, y), &spritesheet, &shaderProgram);
-	sprite->setNumberAnimations(14);
+	float y = 0.125;
+
+	animations.resize(14);
+
+	addAnimation(STAND_LEFT, glm::ivec2(18, 30), glm::vec2(7, 18));
+	addAnimation(STAND_RIGHT, glm::ivec2(18, 30), glm::vec2(7, 18));
+	addAnimation(MOVE_LEFT, glm::ivec2(20, 30), glm::vec2(6, 18));
+	addAnimation(MOVE_RIGHT, glm::ivec2(20, 30), glm::vec2(6, 18));
+	addAnimation(JUMP_LEFT, glm::ivec2(20, 31), glm::vec2(6, 17));
+	addAnimation(JUMP_RIGHT, glm::ivec2(20, 31), glm::vec2(6, 17));
+	addAnimation(BUTT_ATTACK_LEFT, glm::ivec2(20, 25), glm::vec2(6, 22));
+	addAnimation(BUTT_ATTACK_RIGHT, glm::ivec2(20, 25), glm::vec2(6, 22));
+	addAnimation(BUTT_FALL_LEFT, glm::ivec2(20, 23), glm::vec2(6, 25));
+	addAnimation(BUTT_FALL_RIGHT, glm::ivec2(20, 23), glm::vec2(6, 25));
+	addAnimation(STOP_RIGHT, glm::ivec2(20, 28), glm::vec2(6, 20));
+	addAnimation(STOP_LEFT, glm::ivec2(20, 28), glm::vec2(6, 20));
+	addAnimation(CROUCH_DOWN_LEFT, glm::ivec2(18, 20), glm::vec2(7, 28));
+	addAnimation(CROUCH_DOWN_RIGHT, glm::ivec2(18, 20), glm::vec2(7, 28));
+
+	sprite = Sprite::createSprite(glm::ivec2(32, 48), glm::vec2(x, y), &spritesheet, &shaderProgram);
+	sprite->setNumberAnimations(animations.size());
+
+	/*sprite = Sprite::createSprite(glm::ivec2(32, 48), glm::vec2(x, y), &spritesheet, &shaderProgram);
+	sprite->setNumberAnimations(14);*/
 	
 		sprite->setAnimationSpeed(STAND_LEFT, 2);
 		sprite->addKeyframe(STAND_LEFT, glm::vec2(x * 0.f, y * 1.f));
 		sprite->addKeyframe(STAND_LEFT, glm::vec2(x * 1.f, y * 1.f));
 		
-		sprite->setAnimationSpeed(STAND_RIGHT, 2);
+		sprite->setAnimationSpeed(STAND_RIGHT, 2);	
 		sprite->addKeyframe(STAND_RIGHT, glm::vec2(x * 0.f, y * 0.f));
 		sprite->addKeyframe(STAND_RIGHT, glm::vec2(x * 1.f, y * 0.f));
 		
@@ -85,10 +107,27 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 		sprite->addKeyframe(CROUCH_DOWN_RIGHT, glm::vec2(x * 0.f, y * 2.f));
 		sprite->addKeyframe(CROUCH_DOWN_RIGHT, glm::vec2(x * 1.f, y * 2.f));
 
-	sprite->changeAnimation(0);
+	/*glm::vec2 initialPosition = glm::vec2(float(tileMapDispl.x + posPlayer.x + hitBoxOffset.x), 
+											float(tileMapDispl.y + posPlayer.y - hitBox.y + hitBoxOffset.y));
+	sprite->setPosition(initialPosition);*/
+
+	//sprite->changeAnimation(0);
 	tileMapDispl = tileMapPos;
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
-	
+	//sprite->setPosition(glm::vec2(float(tileMapDispl.x), float(tileMapDispl.y)));
+}
+
+
+void Player::addAnimation(int animId, const glm::ivec2& hitBox, const glm::vec2& hitBoxOffset)
+{
+	animations[animId] = { hitBox, hitBoxOffset };
+}
+
+
+void Player::updateHitBox(int animId)
+{
+	hitBox = animations[animId].hitBox;
+	hitBoxOffset = animations[animId].hitBoxOffset;
 }
 
 
@@ -119,6 +158,9 @@ void Player::handleInputs(int deltaTime)
 		}
 	}
 
+	//updateHitBox();
+	//changeAnimations(deltaTime);
+
 	avgVelocity.x = (velStart.x + velPlayer.x) / 2.0f;
 	posPlayer.x += avgVelocity.x * dt;
 
@@ -147,6 +189,7 @@ void Player::handleInputs(int deltaTime)
 	else
 		jumping = true; 
 
+	changeAnimations(deltaTime);
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
 }
 
@@ -201,13 +244,13 @@ void Player::handleCrouch()
 		else
 			attacking = true; 
 
-		hitBox = glm::ivec2(18, 18);
-		hitBoxOffset = glm::ivec2(7, 13);
+		hitBox = glm::ivec2(18, 19);
+		hitBoxOffset = glm::ivec2(7, 28);
 	}
 	else
 	{
-		hitBox = glm::ivec2(18, 30);
-		hitBoxOffset = glm::ivec2(7, 1);
+		hitBox = glm::ivec2(18, 29);
+		hitBoxOffset = glm::ivec2(7, 18);
 		crouching = false;
 		if (!moving) stopping = true;
 	}
@@ -227,50 +270,75 @@ void Player::changeAnimations(int deltaTime)
 
 	if (!moving && !stopping && !jumping && !crouching)
 	{
-		if (facingRight)
+		if (facingRight) {
 			changeAnimation(STAND_RIGHT);
-		else
+			updateHitBox(STAND_RIGHT);
+		}
+		else {
 			changeAnimation(STAND_LEFT);
+			updateHitBox(STAND_LEFT);
+		}
 	}
 
 	else if (moving && !jumping)
 	{
-		if (facingRight)
+		if (facingRight) {
 			changeAnimation(MOVE_RIGHT);
-		else
+			updateHitBox(MOVE_RIGHT);
+		}
+			
+		else {
 			changeAnimation(MOVE_LEFT);
+			updateHitBox(MOVE_LEFT);
+		}	
 	}
 
 	else if (stopping && !jumping && !crouching)
 	{
-		if (facingRight)
+		if (facingRight) {
 			changeAnimation(STOP_RIGHT);
-		else
+			updateHitBox(STOP_RIGHT);
+		}
+		else {
 			changeAnimation(STOP_LEFT);
+			updateHitBox(STOP_LEFT);
+		}
 	}
 
 	else if (crouching)
 	{
-		if (facingRight)
+		if (facingRight) {
 			changeAnimation(CROUCH_DOWN_RIGHT);
-		else
+			updateHitBox(CROUCH_DOWN_RIGHT);
+		}
+		else {
 			changeAnimation(CROUCH_DOWN_LEFT);
+			updateHitBox(CROUCH_DOWN_LEFT);
+		}
 	}
 
 	else if (jumping && !attacking)
 	{
-		if (facingRight)
+		if (facingRight) {
 			changeAnimation(JUMP_RIGHT);
-		else
+			updateHitBox(JUMP_RIGHT);
+		}
+		else {
 			changeAnimation(JUMP_LEFT);
+			updateHitBox(JUMP_LEFT);
+		}
 	}
 
 	else if (jumping && attacking)
 	{
-		if (facingRight)
+		if (facingRight) {
 			changeAnimation(BUTT_ATTACK_RIGHT);
-		else
+			updateHitBox(BUTT_ATTACK_RIGHT);
+		}
+		else {
 			changeAnimation(BUTT_ATTACK_LEFT);
+			updateHitBox(BUTT_ATTACK_LEFT);
+		}
 	}
 }
 
@@ -278,7 +346,6 @@ void Player::changeAnimations(int deltaTime)
 void Player::update(int deltaTime)
 {
 	handleInputs(deltaTime);
-	changeAnimations(deltaTime);
 }
 
 void Player::render()
