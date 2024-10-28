@@ -1,18 +1,23 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include "Game.h"
+#include "Interface.h"
 
 
 void Game::init()
 {
 	bPlay = true;
 	glClearColor(0.0f, 0.67f, 1.0f, 1.0f);
-	scene.init();
+	//scene.init();
+	currentScreen = new MainScreen();  // Aquí puedes usar el puntero de tipo Interface*
+	currentScreen->init();  // Llamamos al método init() de MainScreen
 }
 
 bool Game::update(int deltaTime)
 {
-	scene.update(deltaTime);
+	//scene.update(deltaTime);
+
+	currentScreen->update(deltaTime);
 
 	return bPlay;
 }
@@ -20,7 +25,8 @@ bool Game::update(int deltaTime)
 void Game::render()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	scene.render();
+	//scene.render();
+	currentScreen->render();
 }
 
 void Game::keyPressed(int key)
@@ -51,6 +57,3 @@ bool Game::getKey(int key) const
 {
 	return keys[key];
 }
-
-
-

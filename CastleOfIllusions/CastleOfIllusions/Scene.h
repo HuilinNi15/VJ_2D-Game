@@ -28,10 +28,11 @@ public:
 	Scene();
 	~Scene();
 
-	void init();
-	void update(int deltaTime);
+	virtual void init();
+	virtual void update(int deltaTime);
+	virtual void render();
+
 	void updateCam(int deltaTime);
-	void render();
 
 private:
 	void initShaders();

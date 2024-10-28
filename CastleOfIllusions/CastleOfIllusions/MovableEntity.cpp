@@ -101,6 +101,12 @@ void MovableEntity::render()
 	sprite->render();
 }
 
+void MovableEntity::setStatic()
+{
+	isStatic = !isStatic;
+
+}
+
 void MovableEntity::setTileMap(TileMap* tileMap)
 {
 	map = tileMap;

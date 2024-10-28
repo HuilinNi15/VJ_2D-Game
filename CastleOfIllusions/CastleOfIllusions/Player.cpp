@@ -15,7 +15,7 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 	float x = 0.0625; 
 	float y = 0.125;
 
-	animations.resize(18);
+	animations.resize(19);
 
 	size = glm::ivec2(32, 48);
 
@@ -37,6 +37,7 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 	addAnimation(PREPARE_PICKUP_RIGHT, size, glm::ivec2(18, 20), glm::ivec2(7, 28));
 	addAnimation(ALMOST_FALLING_LEFT, size, glm::ivec2(9, 20), glm::ivec2(16, 28));
 	addAnimation(ALMOST_FALLING_RIGHT, size, glm::ivec2(9, 20), glm::ivec2(7, 28));
+	addAnimation(WAVING_HAND, size, glm::ivec2(20, 30), glm::ivec2(6, 18));
 
 	sprite = Sprite::createSprite(size, glm::vec2(x, y), &spritesheet, &shaderProgram);
 	sprite->setNumberAnimations(animations.size());
@@ -124,6 +125,12 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 		sprite->setAnimationSpeed(ALMOST_FALLING_RIGHT, 4);
 		sprite->addKeyframe(ALMOST_FALLING_RIGHT, glm::vec2(x * 9.f, y * 2.f));
 		sprite->addKeyframe(ALMOST_FALLING_RIGHT, glm::vec2(x * 10.f, y * 2.f));
+
+		sprite->setAnimationSpeed(WAVING_HAND, 8);
+		sprite->addKeyframe(WAVING_HAND, glm::vec2(x * 12, y * 2));
+		sprite->addKeyframe(WAVING_HAND, glm::vec2(x * 13, y * 2));
+		sprite->addKeyframe(WAVING_HAND, glm::vec2(x * 14, y * 2));
+		sprite->addKeyframe(WAVING_HAND, glm::vec2(x * 15, y * 2));
 
 	tileMapDispl = tileMapPos;
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + pos.x), float(tileMapDispl.y + pos.y)));

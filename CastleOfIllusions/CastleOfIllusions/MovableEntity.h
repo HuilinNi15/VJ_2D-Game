@@ -20,6 +20,7 @@ public:
 
 	bool checkCollision(MovableEntity* other);
 
+	void setStatic();
 	void setTileMap(TileMap* tileMap);
 	void setPosition(const glm::vec2& position);
 	glm::vec2 getPosition() const { return pos; };

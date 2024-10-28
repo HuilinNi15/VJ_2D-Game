@@ -4,6 +4,7 @@
 
 #include <GLFW/glfw3.h>
 #include "Scene.h"
+#include "Interface.h"
 
 
 #define SCREEN_WIDTH 256 * 4
@@ -45,6 +46,7 @@ private:
 	bool keys[GLFW_KEY_LAST+1]; // Store key states so that 
 							    // we can have access at any time
 	Scene scene;
+	Interface* currentScreen;
 
 };
 
