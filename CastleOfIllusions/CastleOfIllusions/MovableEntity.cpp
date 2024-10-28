@@ -78,6 +78,17 @@ void MovableEntity::recalculatePos(const glm::vec2& velStart)
 }
 
 
+bool MovableEntity::checkCollision(MovableEntity* other)
+{
+	return false; 
+}
+
+
+bool MovableEntity::isColliding()
+{
+	return false; 
+}
+
 
 void MovableEntity::render()
 {

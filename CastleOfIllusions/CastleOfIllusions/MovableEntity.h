@@ -18,9 +18,15 @@ public:
 	virtual void update(int deltaTime);
 	void render();
 
+	bool checkCollision(MovableEntity* other);
+
 	void setTileMap(TileMap* tileMap);
 	void setPosition(const glm::vec2& position);
-	glm::ivec2 getPosition() const { return pos; };
+	glm::vec2 getPosition() const { return pos; };
+	glm::vec2 getVelocity() const { return vel; };
+	glm::ivec2 getSize() const { return size; };
+	glm::ivec2 getHitBox() const { return hitBox; };
+	glm::ivec2 getHitBoxOffset() const { return hitBoxOffset; };
 
 protected:
 	float dt;
@@ -31,6 +37,8 @@ protected:
 	virtual void calculateVelocity(int deltaTime); 
 	virtual void otherChanges();
 	virtual void recalculatePos(const glm::vec2& velStart);
+
+	bool isColliding(); 
 
 	struct AnimationData {
 		glm::ivec2 size;

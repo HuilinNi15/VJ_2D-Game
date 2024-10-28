@@ -37,7 +37,7 @@ public:
 	glm::ivec2 TileMap::addOffset(glm::ivec2 pos, const glm::ivec2& boxOffset) const;
 	bool collisionMoveLeft(const glm::vec2& pos, const glm::ivec2& size, const glm::ivec2& offset) const;
 	bool collisionMoveRight(const glm::vec2& pos, const glm::ivec2& size, const glm::ivec2& offset) const;
-	bool collisionMoveDown(const glm::vec2& pos, const glm::ivec2& size, const glm::ivec2& offset, float* posY) const;
+	bool collisionMoveDown(const glm::vec2& pos, const glm::ivec2& size, const glm::ivec2& offset, float* posY, const bool correctPos = true) const;
 
 private:
 	bool loadLevel(const string& levelFile);
@@ -54,12 +54,12 @@ private:
 	glm::vec2 tileTexSize;
 	int* map, decoration, background, sprites;
 
-	//std::vector<int> checkList = {8, 9, 10, 11, 12, 24, 25, 27, 40, 41, 42}; 
+	std::vector<int> checkList = {8, 9, 10, 11, 12, 24, 25, 27, 40, 41, 42}; 
 							/*{0, 1, 2, 3, 4, 5, 6, 7, 17, 18, 19, 20, 21, 22, 23,
 							28, 33, 34, 35, 37, 38, 39, 49, 50, 52, 54, 65, 66,
 							81, 82, 83, 84, 97, 98, 99, 100, 101, 102, 103 };*/
 
-	std::vector<int> checkList = { 9, 10, 17, 18, 29, 30 };
+	//std::vector<int> checkList = { 9, 10, 17, 18, 29, 30 };
 };
 
 

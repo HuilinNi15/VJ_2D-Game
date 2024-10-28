@@ -15,7 +15,7 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 	float x = 0.0625; 
 	float y = 0.125;
 
-	animations.resize(14);
+	animations.resize(18);
 
 	size = glm::ivec2(32, 48);
 
@@ -33,6 +33,10 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 	addAnimation(STOP_LEFT, size, glm::ivec2(20, 28), glm::ivec2(6, 20));
 	addAnimation(CROUCH_DOWN_LEFT, size, glm::ivec2(18, 20), glm::ivec2(7, 28));
 	addAnimation(CROUCH_DOWN_RIGHT, size, glm::ivec2(18, 20), glm::ivec2(7, 28));
+	addAnimation(PREPARE_PICKUP_LEFT, size, glm::ivec2(18, 20), glm::ivec2(7, 28));
+	addAnimation(PREPARE_PICKUP_RIGHT, size, glm::ivec2(18, 20), glm::ivec2(7, 28));
+	addAnimation(ALMOST_FALLING_LEFT, size, glm::ivec2(9, 20), glm::ivec2(16, 28));
+	addAnimation(ALMOST_FALLING_RIGHT, size, glm::ivec2(9, 20), glm::ivec2(7, 28));
 
 	sprite = Sprite::createSprite(size, glm::vec2(x, y), &spritesheet, &shaderProgram);
 	sprite->setNumberAnimations(animations.size());
@@ -104,6 +108,22 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 		sprite->setAnimationSpeed(CROUCH_DOWN_RIGHT, 4);
 		sprite->addKeyframe(CROUCH_DOWN_RIGHT, glm::vec2(x * 0.f, y * 2.f));
 		sprite->addKeyframe(CROUCH_DOWN_RIGHT, glm::vec2(x * 1.f, y * 2.f));
+
+		sprite->setAnimationSpeed(PREPARE_PICKUP_LEFT, 4);
+		sprite->addKeyframe(PREPARE_PICKUP_LEFT, glm::vec2(x * 0.f, y * 5.f));
+		sprite->addKeyframe(PREPARE_PICKUP_LEFT, glm::vec2(x * 1.f, y * 5.f));
+
+		sprite->setAnimationSpeed(PREPARE_PICKUP_RIGHT, 4);
+		sprite->addKeyframe(PREPARE_PICKUP_RIGHT, glm::vec2(x * 0.f, y * 4.f));
+		sprite->addKeyframe(PREPARE_PICKUP_RIGHT, glm::vec2(x * 1.f, y * 4.f));
+
+		sprite->setAnimationSpeed(ALMOST_FALLING_LEFT, 4);
+		sprite->addKeyframe(ALMOST_FALLING_LEFT, glm::vec2(x * 9.f, y * 3.f));
+		sprite->addKeyframe(ALMOST_FALLING_LEFT, glm::vec2(x * 10.f, y * 3.f));
+
+		sprite->setAnimationSpeed(ALMOST_FALLING_RIGHT, 4);
+		sprite->addKeyframe(ALMOST_FALLING_RIGHT, glm::vec2(x * 9.f, y * 2.f));
+		sprite->addKeyframe(ALMOST_FALLING_RIGHT, glm::vec2(x * 10.f, y * 2.f));
 
 	tileMapDispl = tileMapPos;
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + pos.x), float(tileMapDispl.y + pos.y)));
@@ -219,14 +239,34 @@ void Player::changeAnimations(int deltaTime)
 
 	if (!moving && !stopping && !falling && !crouching)
 	{
-		if (facingRight) {
-			changeAnimation(STAND_RIGHT);
-			updateHitBox(STAND_RIGHT);
-		}
-		else {
-			changeAnimation(STAND_LEFT);
+		pos.y += MIN_FALL_VELOCITY * dt;
+		updateHitBox(ALMOST_FALLING_LEFT);
+		if (!map->collisionMoveDown(pos, hitBox, hitBoxOffset, &pos.y, false))
+		{
+			changeAnimation(ALMOST_FALLING_LEFT);
 			updateHitBox(STAND_LEFT);
 		}
+		else
+		{
+			updateHitBox(ALMOST_FALLING_RIGHT);
+			if (!map->collisionMoveDown(pos, hitBox, hitBoxOffset, &pos.y, false))
+			{
+				changeAnimation(ALMOST_FALLING_RIGHT);
+				updateHitBox(STAND_RIGHT);
+			}
+			else
+			{
+				if (facingRight) {
+					changeAnimation(STAND_RIGHT);
+					updateHitBox(STAND_RIGHT);
+				}
+				else {
+					changeAnimation(STAND_LEFT);
+					updateHitBox(STAND_LEFT);
+				}
+			}
+		}
+		pos.y -= MIN_FALL_VELOCITY * dt;
 	}
 
 	else if (moving && !falling)

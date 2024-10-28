@@ -24,14 +24,15 @@ void Scene::init()
 {
 	initShaders();
 	// Forest practice map
-	map = TileMap::createTileMap("levels/forest_practice_map.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+	//map = TileMap::createTileMap("levels/forest_practice_map.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 	// Chocolate map
-	//map = TileMap::createTileMap("levels/chocolate_map.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+	map = TileMap::createTileMap("levels/chocolate_map.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 
 	player = new Player();
 	player->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 	player->setPosition(glm::vec2(INIT_PLAYER_X_TILES * map->getTileSize(), INIT_PLAYER_Y_TILES * map->getTileSize()));
 	player->setTileMap(map);
+
 	projection = glm::ortho(0.f, float(CAMERA_WIDTH), float(CAMERA_HEIGHT), 0.f);
 	currentTime = 0.0f;
 }
