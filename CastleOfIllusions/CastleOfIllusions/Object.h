@@ -30,7 +30,7 @@ public:
 };
 
 
-class Chess : public Object {
+class Chest : public Object {
 public:
     void throwObject() override {
         isBroken = true; // Chess piece breaks when thrown
