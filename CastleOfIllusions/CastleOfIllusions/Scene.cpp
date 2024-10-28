@@ -9,6 +9,7 @@ Scene::Scene()
 {
 	map = NULL;
 	player = NULL;
+	currentTime = 0.0f; 
 }
 
 Scene::~Scene()

@@ -1,20 +1,44 @@
 import re
+import xml.etree.ElementTree as ET
+
+def parse_layer_data(data_text):
+    # Parse CSV data, returning a 2D list of integers for easier processing
+    rows = []
+    for line in data_text.strip().splitlines():
+        cols = []
+        for tile in line.split(','):
+            if tile not in [',', '']:
+                cols.append(int(tile))
+        rows.append(cols)
+    return rows
+
+def get_layer_position_data(layer_data):
+    # Extract non-zero tiles with their position for enemies and objects
+    position_data = []
+    for y, row in enumerate(layer_data):
+        for x, tile in enumerate(row):
+            if tile != 0:  # Assuming 0 means empty space
+                position_data.append((tile, x, y))
+    return position_data
 
 def modify_head(file_path, output_path):
-    # Read the original file
-    with open(file_path, 'r', encoding='utf-8') as file:
-        lines = file.readlines()
+    # Parse the XML structure
+    tree = ET.parse(file_path)
+    root = tree.getroot()
+    
+    # Extract map attributes for header
+    width = root.attrib['width']
+    height = root.attrib['height']
+    tilewidth = root.attrib['tilewidth']
+    tileheight = root.attrib['tileheight']
+    
+    for tileset in tree.findall('tileset'):
+        if 'interactives' in tileset.attrib['source']:
+            objects_start_idx = int(tileset.attrib['firstgid'])
+        if 'enemies' in tileset.attrib['source']:
+            enemies_start_idx = int(tileset.attrib['firstgid'])
 
-    # Extract values from the XML header
-    xml_header = "".join(lines[:10])  # Assuming the header is within the first 10 lines
-
-    # Use regular expressions to find the needed values
-    width = re.search(r'width="(\d+)"', xml_header).group(1)
-    height = re.search(r'height="(\d+)"', xml_header).group(1)
-    tilewidth = re.search(r'tilewidth="(\d+)"', xml_header).group(1)
-    tileheight = re.search(r'tileheight="(\d+)"', xml_header).group(1)
-
-    # Prepare the new header with the extracted values
+    # Write the new header
     new_header = f'''TILEMAP
 {width} {height}                           -- Size of tile map in tiles
 {tilewidth} {tileheight}                   -- Tile size & block size
@@ -22,20 +46,34 @@ images/tiles.png                           -- Tilesheet
 16 8                                       -- Number of tiles in tilesheet
 '''
 
-    # Filter lines that don't start with '<' and replace commas with spaces in the data lines
-    filtered_lines = []
-    for line in lines:
-        if not line.strip().startswith('<'):
-            # Replace commas with spaces
-            filtered_lines.append(line.replace(',', ' '))
-
-    # Write the new file with the modified header
+    # Open output file and write header
     with open(output_path, 'w', encoding='utf-8') as output_file:
-        output_file.write(new_header)  # Write the new header
-        output_file.writelines(filtered_lines)  # Write the rest of the file content
+        output_file.write(new_header)
+        
+        # Process each layer in the map
+        for layer in root.findall('layer'):
+            layer_name = layer.attrib['name']
+            data_element = layer.find('data')
+            
+            # Decode CSV data for the layer
+            layer_data = parse_layer_data(data_element.text)
+            
+            # Separate handling based on layer type
+            if layer_name == "Map" or layer_name == "Decorations":
+                output_file.write(f"\n{layer_name.upper()}\n")
+                for row in layer_data:
+                    output_file.write(" ".join(map(str, row)) + "\n")
+            elif layer_name == "Enemies" or layer_name == "Objects":
+                name = 'Enemy' if layer_name == "Enemies" else "Object" 
+                output_file.write(f"\n{layer_name.upper()}\n")
+                position_data = get_layer_position_data(layer_data)
+                for tile, x, y in position_data:
+                    tile -= enemies_start_idx if layer_name == "Enemies" else objects_start_idx
+                    output_file.write(f"{name} {tile} at position ({x}, {y})\n")
+                    
+    print(f"File modified and saved to {output_path}")
 
-
-map_list = ['chocolate_map.txt', 'forest_practice_map.txt']
+# Usage
+map_list = ['./levels/forest_map.tmx']
 for i in map_list:
-    modify_head(i, i)
-    print(f"File modified and saved to {i}")
+    modify_head(i, i.replace('.tmx', '_prueba.txt'))

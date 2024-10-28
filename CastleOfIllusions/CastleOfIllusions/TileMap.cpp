@@ -58,6 +58,7 @@ bool TileMap::loadLevel(const string& levelFile)
 	getline(fin, line);
 	if (line.compare(0, 7, "TILEMAP") != 0)
 		return false;
+
 	getline(fin, line);
 	sstream.str(line);
 	sstream >> mapSize.x >> mapSize.y;
