@@ -239,3 +239,31 @@ bool TileMap::collisionMoveDown(const glm::vec2& pos, const glm::ivec2& size, co
 
 	return false;
 }
+
+bool TileMap::collisionMoveUp(const glm::vec2& pos, const glm::ivec2& size, const glm::ivec2& offset, float* posY, const bool correctPos) const
+{
+	int x0, x1, y;
+
+	glm::ivec2 intPos = addOffset(glm::ivec2(pos), offset);
+
+	x0 = intPos.x / tileSize;
+	x1 = (intPos.x + size.x - 1) / tileSize;
+	y = intPos.y / tileSize; // Check the tile above
+
+	for (int x = x0; x <= x1; x++)
+	{
+		int value = map[y * mapSize.x + x];
+
+		if (std::find(checkList.begin(), checkList.end(), value) != checkList.end())
+		{
+			if (*posY + tileSize * y >= 0) // Adjust for upward collision
+			{
+				if (correctPos)
+					*posY = tileSize * y + tileSize - offset.y; // Adjust position to be below the tile
+				return true;
+			}
+		}
+	}
+
+	return false;
+}

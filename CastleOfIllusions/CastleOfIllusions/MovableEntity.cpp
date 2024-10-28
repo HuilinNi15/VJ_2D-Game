@@ -70,6 +70,12 @@ void MovableEntity::recalculatePos(const glm::vec2& velStart)
 		falling = false;
 		verticalCollision = true;
 	}
+	else if (map->collisionMoveUp(pos, hitBox, hitBoxOffset, &pos.y))
+	{
+		vel.y = 0.0f;
+		falling = true;
+		verticalCollision = true;
+	}
 	else
 	{
 		verticalCollision = false; 
