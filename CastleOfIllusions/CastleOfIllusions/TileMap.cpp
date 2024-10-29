@@ -9,17 +9,30 @@
 using namespace std;
 
 
-TileMap* TileMap::createTileMap(const string& levelFile, const glm::vec2& minCoords, ShaderProgram& program)
+TileMap* TileMap::createTileMap(const string& levelFile, const glm::vec2& minCoords, ShaderProgram& program, bool save_decoration)
 {
-	TileMap* map = new TileMap(levelFile, minCoords, program);
+	TileMap* map = new TileMap(levelFile, minCoords, program, save_decoration);
 
 	return map;
 }
 
+//ListOfPointersToEnemy getEnemies(const string& levelFile)
+//{
+//	// search for the line that says Enemies
+//	// create as many instances as lines of enemies there are
+//	// return them in a vector
+//}
+//
+//ListOfPointersToObject getObjects(const string& levelFile)
+//{
+//	// the same but for objects
+//}
 
-TileMap::TileMap(const string& levelFile, const glm::vec2& minCoords, ShaderProgram& program)
+
+
+TileMap::TileMap(const string& levelFile, const glm::vec2& minCoords, ShaderProgram& program, bool save_decoration)
 {
-	loadLevel(levelFile);
+	loadLevel(levelFile, save_decoration);
 	prepareArrays(minCoords, program);
 }
 
@@ -46,7 +59,7 @@ void TileMap::free()
 	glDeleteBuffers(1, &vbo);
 }
 
-bool TileMap::loadLevel(const string& levelFile)
+bool TileMap::loadLevel(const string& levelFile, bool save_decoration)
 {
 	ifstream fin;
 	string line, tilesheetFile;
@@ -82,31 +95,52 @@ bool TileMap::loadLevel(const string& levelFile)
 	tileTexSize = glm::vec2(1.f / tilesheetSize.x, 1.f / tilesheetSize.y);
 
 	map = new int[mapSize.x * mapSize.y];
-	for (int j = 0; j < mapSize.y; j++)
-	{
-		getline(fin, line);
-		stringstream ss(line);
-		int tile;
+	if (save_decoration) {
+		while (getline(fin, line)) {
+			if (line.find("DECORATIONS") != std::string::npos) {
+				for (int j = 0; j < mapSize.y; j++) {
+					//std::cout << line << std::endl;
+					getline(fin, line);
+					std::stringstream ss(line);
+					int decoration;
 
-		for (int i = 0; i < mapSize.x; i++)
-		{
-			ss >> tile;
-			map[j * mapSize.x + i] = tile;
+					for (int i = 0; i < mapSize.x; i++) {
+						ss >> decoration;
+						map[j * mapSize.x + i] = decoration; 
+					}
+				}
+				break;
+			}
 		}
-#ifndef _WIN32
-		fin.get(tile);
-#endif
+	}
+	else {
+		while (getline(fin, line)) {
+			if (line.find("MAP") != std::string::npos) {
+				for (int j = 0; j < mapSize.y; j++) {
+					//std::cout << line << std::endl;
+					getline(fin, line);
+					std::stringstream ss(line);
+					int tile;
+
+					for (int i = 0; i < mapSize.x; i++) {
+						ss >> tile;
+						map[j * mapSize.x + i] = tile;
+					}
+				}
+				break; 
+			}
+		}
 	}
 
-	/*for (int i=0; i<mapSize.y; ++i)
-	{
-		for (int j=0; j<mapSize.x; ++j) {
-			cout << map[i*mapSize.x+j] << " ";
-		}
-		cout << endl;
-	}*/
-
 	fin.close();
+
+	//for (int i=0; i<mapSize.y; ++i)
+	//{
+	//	for (int j=0; j<mapSize.x; ++j) {
+	//		cout << map[i*mapSize.x+j] << " ";
+	//	}
+	//	cout << endl;
+	//}
 
 	return true;
 }
@@ -186,7 +220,7 @@ bool TileMap::collisionMoveLeft(const glm::vec2& pos, const glm::ivec2& size, co
 	for (int y = y0; y <= y1; y++)
 	{
 		int value = map[y * mapSize.x + x];
-		if (std::find(checkList.begin(), checkList.end(), value) != checkList.end())
+		if (value != 0)
 			return true;
 	}
 
@@ -205,7 +239,7 @@ bool TileMap::collisionMoveRight(const glm::vec2& pos, const glm::ivec2& size, c
 	for (int y = y0; y <= y1; y++)
 	{
 		int value = map[y * mapSize.x + x];
-		if (std::find(checkList.begin(), checkList.end(), value) != checkList.end())
+		if (value != 0)
 			return true;
 	}
 
@@ -226,7 +260,7 @@ bool TileMap::collisionMoveDown(const glm::vec2& pos, const glm::ivec2& size, co
 	{
 		int value = map[y * mapSize.x + x];
 
-		if (std::find(checkList.begin(), checkList.end(), value) != checkList.end())
+		if (value != 0)
 		{
 			if (*posY - tileSize * y + size.y <= 8)
 			{
@@ -254,7 +288,7 @@ bool TileMap::collisionMoveUp(const glm::vec2& pos, const glm::ivec2& size, cons
 	{
 		int value = map[y * mapSize.x + x];
 
-		if (std::find(checkList.begin(), checkList.end(), value) != checkList.end())
+		if (value != 0)
 		{
 			if (*posY + tileSize * y >= 0) // Adjust for upward collision
 			{

@@ -1,8 +1,8 @@
 TILEMAP
 66 12                           -- Size of tile map in tiles
 16 16                   -- Tile size & block size
-images/tiles.png                           -- Tilesheet
-16 8                                       -- Number of tiles in tilesheet
+images/tiles_forest_practice_map.png                                     -- Tilesheet
+8 4                          -- Number of tiles in tilesheet
 
 MAP
 17 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 17
@@ -33,13 +33,13 @@ DECORATIONS
 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
 
 ENEMIES
-Enemy 8 at position (53, 4)
-Enemy 0 at position (38, 5)
-Enemy 0 at position (20, 6)
-Enemy 8 at position (43, 8)
+8 53 4
+0 38 5
+0 20 6
+8 43 8
 
 OBJECTS
-Object 1 at position (63, 4)
-Object 0 at position (22, 6)
-Object 0 at position (35, 6)
-Object 4 at position (34, 7)
+1 63 4
+0 22 6
+0 35 6
+4 34 7

@@ -2,11 +2,14 @@
 #define _INTERFACE_INCLUDE
 
 #include <glm/glm.hpp>
+#include <vector>
 #include "ShaderProgram.h"
 #include "TileMap.h"
 #include "Texture.h"
 #include "Sprite.h"
 #include "Player.h"
+#include "Object.h"
+#include "Enemy.h"
 
 
 #define SCREEN_X 0
@@ -52,9 +55,14 @@ private:
     float cameraX = 0.0f;
     float cameraSpeed = 10.0f;
 
-    TileMap* map;
-    TileMap* decorations; 
+    struct mapData {
+        TileMap* map;
+        TileMap* decorations;
+        std::vector<Enemy> enemies;
+        std::vector<Object> objects;
+    };
     Player* player;
+    mapData map; 
 };
 
 

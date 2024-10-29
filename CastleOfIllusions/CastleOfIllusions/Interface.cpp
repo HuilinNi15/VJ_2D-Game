@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cmath>
 #include <glm/gtc/matrix_transform.hpp>
+#include <vector>
 #include "Interface.h"
 
 
@@ -69,20 +70,22 @@ GameScene::GameScene()
 	// Forest practice map
 	//map = TileMap::createTileMap("levels/forest_practice_map.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 	// Chocolate map
-	map = TileMap::createTileMap("levels/chocolate_map.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
-
+	
+	string level = "levels/forest_map_prueba.txt"; 
+	map.map = TileMap::createTileMap(level, glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+	map.decorations = TileMap::createTileMap(level, glm::vec2(SCREEN_X, SCREEN_Y), texProgram, true);
+	
 	player = new Player();
 	player->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
-	player->setPosition(glm::vec2(INIT_PLAYER_X_TILES * map->getTileSize(), INIT_PLAYER_Y_TILES * map->getTileSize()));
-	player->setTileMap(map);
+	player->setPosition(glm::vec2(INIT_PLAYER_X_TILES * map.map->getTileSize(), INIT_PLAYER_Y_TILES * map.map->getTileSize()));
+	player->setTileMap(map.map);
 }
 
 GameScene::~GameScene()
 {
-	if (map != NULL)
-		delete map;
-	if (player != NULL)
-		delete player;
+	delete map.map;
+	delete map.decorations;
+	delete player;
 }
 
 void GameScene::updateCam(int deltaTime)
@@ -90,7 +93,7 @@ void GameScene::updateCam(int deltaTime)
 	float deltaTimeSec = (float)deltaTime / 1000.0f;
 	glm::ivec2 posPlayer = player->getPosition();
 
-	glm::ivec2 mapPixelSize = map->getMapPixelSize();
+	glm::ivec2 mapPixelSize = map.map->getMapPixelSize();
 	int mapWidth = mapPixelSize.x;
 	int mapHeight = mapPixelSize.y;
 
@@ -129,7 +132,8 @@ void GameScene::update(int deltaTime)
 void GameScene::render()
 {
 	Scene::render();
-	map->render();
+	map.decorations->render();
+	map.map->render();
 	player->render();
 }
 

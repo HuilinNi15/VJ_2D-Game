@@ -37,13 +37,17 @@ def modify_head(file_path, output_path):
             objects_start_idx = int(tileset.attrib['firstgid'])
         if 'enemies' in tileset.attrib['source']:
             enemies_start_idx = int(tileset.attrib['firstgid'])
+        if '1' == tileset.attrib['firstgid']:
+            file = tileset.attrib['source'][3:].replace('.tsx', '.png')
+
+    tile_sheet_size = input("How many tiles in tilesheet (x y)? ")
 
     # Write the new header
     new_header = f'''TILEMAP
 {width} {height}                           -- Size of tile map in tiles
 {tilewidth} {tileheight}                   -- Tile size & block size
-images/tiles.png                           -- Tilesheet
-16 8                                       -- Number of tiles in tilesheet
+{file}                                     -- Tilesheet
+{tile_sheet_size}                          -- Number of tiles in tilesheet
 '''
 
     # Open output file and write header
@@ -64,16 +68,15 @@ images/tiles.png                           -- Tilesheet
                 for row in layer_data:
                     output_file.write(" ".join(map(str, row)) + "\n")
             elif layer_name == "Enemies" or layer_name == "Objects":
-                name = 'Enemy' if layer_name == "Enemies" else "Object" 
                 output_file.write(f"\n{layer_name.upper()}\n")
                 position_data = get_layer_position_data(layer_data)
                 for tile, x, y in position_data:
                     tile -= enemies_start_idx if layer_name == "Enemies" else objects_start_idx
-                    output_file.write(f"{name} {tile} at position ({x}, {y})\n")
+                    output_file.write(f"{tile} {x} {y}\n")
                     
     print(f"File modified and saved to {output_path}")
 
 # Usage
-map_list = ['./levels/forest_map.tmx']
+map_list = ['./CastleOfIllusions/levels/forest_map.tmx']
 for i in map_list:
     modify_head(i, i.replace('.tmx', '_prueba.txt'))

@@ -14,16 +14,16 @@
 // it builds a single VBO that contains all tiles. As a result the render
 // method draws the whole map independently of what is visible.
 
-
 class TileMap
 {
 
 private:
-	TileMap(const string& levelFile, const glm::vec2& minCoords, ShaderProgram& program);
+	TileMap(const string& levelFile, const glm::vec2& minCoords, ShaderProgram& program, bool save_decoration = false);
 
 public:
 	// Tile maps can only be created inside an OpenGL context
-	static TileMap* createTileMap(const string& levelFile, const glm::vec2& minCoords, ShaderProgram& program);
+	static TileMap* createTileMap(const string& levelFile, const glm::vec2& minCoords, ShaderProgram& program, bool save_decoration = false);
+	//static glm::vec3* getMovableEntities(const string& levelFile, bool get_enemies = false); 
 
 	~TileMap();
 
@@ -41,7 +41,7 @@ public:
 	bool collisionMoveUp(const glm::vec2& pos, const glm::ivec2& size, const glm::ivec2& offset, float* posY, const bool correctPos = true) const;
 
 private:
-	bool loadLevel(const string& levelFile);
+	bool loadLevel(const string& levelFile, bool save_decoration);
 	void prepareArrays(const glm::vec2& minCoords, ShaderProgram& program);
 
 private:
@@ -53,9 +53,9 @@ private:
 	int tileSize, blockSize;
 	Texture tilesheet;
 	glm::vec2 tileTexSize;
-	int* map, decoration, background, sprites;
+	int* map;
 
-	std::vector<int> checkList = {8, 9, 10, 11, 12, 24, 25, 27, 40, 41, 42}; 
+	//std::vector<int> checkList = {8, 9, 10, 11, 12, 24, 25, 27, 40, 41, 42}; 
 							/*{0, 1, 2, 3, 4, 5, 6, 7, 17, 18, 19, 20, 21, 22, 23,
 							28, 33, 34, 35, 37, 38, 39, 49, 50, 52, 54, 65, 66,
 							81, 82, 83, 84, 97, 98, 99, 100, 101, 102, 103 };*/
