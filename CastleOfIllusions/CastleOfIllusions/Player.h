@@ -2,8 +2,8 @@
 #define _PLAYER_INCLUDE
 
 
+#pragma once
 #include "Sprite.h"
-#include "TileMap.h"
 #include "MovableEntity.h"
 
 
@@ -13,6 +13,7 @@ const float ACCELERATION = 120.0f; // Horizontal acceleration
 const float JUMP_ACCELERATION = 100.0f; // Horizontal acceleration while jumping
 const float STOP_ACCELERATION = 120.0f; // Horizontal deceleration
 const float JUMP_VELOCITY = 245.0f; // Initial vel when jumping
+const float BOUNCE_VELOCITY = 200.0f; // When killing or breaking an object it bounces back up
 
 
 enum PlayerAnims
@@ -31,26 +32,32 @@ enum PlayerAnims
 // Player is basically a Sprite that represents the player. As such it has
 // all properties it needs to track its movement, jumping, and collisions.
 
+class Object; 
+
 
 class Player: public MovableEntity
 {
 
 public:
 	void init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram) override;
-	void changeAnimation(PlayerAnims animation);
 
 private:
 	void handleMove(float direction);
+	void jump(float velocity) { vel.y = -velocity; falling = true; };
 	void handleJump();
 	void handleCrouch();
 	void calculateVelocity(int deltaTime) override;
 	void otherChanges() override;
 	void changeAnimations(int deltaTime) override;
 
+	void pickUp(Object* object) { carrying = object; };
+	void throwObject() { carrying = nullptr; };
+
 	bool facingRight = true; // if false, then facingLeft
 	bool stopping = false; // if true, player is slowing down horizontally
 	bool attacking = false; // if true, player attacking while jumping
 	bool crouching = false; // if true, player is crouched down
+	Object* carrying; 
 };
 
 

@@ -1,7 +1,7 @@
 #include <cmath>
 #include <iostream>
 #include <GL/glew.h>
-#include "MovableEntity.h"
+#include "Player.h"
 #include "Game.h"
 
 
@@ -142,8 +142,6 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 
 void Player::calculateVelocity(int deltaTime)
 {
-	dt = deltaTime / 1000.0f;
-
 	if (Game::instance().getKey(GLFW_KEY_A))
 		handleMove(-1.0f);
 	else if (Game::instance().getKey(GLFW_KEY_D))
@@ -197,10 +195,8 @@ void Player::handleJump()
 {
 	if (Game::instance().getKey(GLFW_KEY_W) && !falling)
 	{
-		falling = true;
+		jump(JUMP_VELOCITY); 
 		crouching = false; 
-
-		vel.y = -JUMP_VELOCITY;
 	}
 }
 
@@ -228,15 +224,28 @@ void Player::handleCrouch()
 
 void Player::otherChanges()
 {
-	if (verticalCollision)
+	if (topCollision)
 		attacking = false; 
-}
 
+	if (Game::instance().getKey(GLFW_KEY_E))
+	{
+		if (moving && !falling && collidedObject && vel == glm::vec2(0.f, 0.f))
+		{
+			pickUp(collidedObject);
+			collidedObject->pickUp(this);
+		}
+		else if (carrying)
+		{
+			carrying->throwObject(); 
+			throwObject();
+		}
+	}
 
-void Player::changeAnimation(PlayerAnims animation)
-{
-	if (sprite->animation() != animation)
-		sprite->changeAnimation(animation);
+	else if (attacking && collidedObject)
+	{
+		collidedObject->breakObject();
+		jump(BOUNCE_VELOCITY);
+	}
 }
 
 
@@ -251,7 +260,7 @@ void Player::changeAnimations(int deltaTime)
 	{
 		pos.y += MIN_FALL_VELOCITY * dt;
 		updateHitBox(ALMOST_FALLING_LEFT);
-		if (!map->collisionMoveDown(pos, hitBox, hitBoxOffset, &pos.y, false))
+		if (!map->map->collisionMoveDown(pos, hitBox, hitBoxOffset, &pos.y, false))
 		{
 			changeAnimation(ALMOST_FALLING_LEFT);
 			updateHitBox(STAND_LEFT);
@@ -259,7 +268,7 @@ void Player::changeAnimations(int deltaTime)
 		else
 		{
 			updateHitBox(ALMOST_FALLING_RIGHT);
-			if (!map->collisionMoveDown(pos, hitBox, hitBoxOffset, &pos.y, false))
+			if (!map->map->collisionMoveDown(pos, hitBox, hitBoxOffset, &pos.y, false))
 			{
 				changeAnimation(ALMOST_FALLING_RIGHT);
 				updateHitBox(STAND_RIGHT);

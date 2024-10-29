@@ -2,26 +2,42 @@
 #define _MOVABLE_ENTITY_INCLUDE
 
 
+#pragma once
 #include "Sprite.h"
-#include "TileMap.h"
+
+
+class Object; 
+class Enemy; 
+class TileMap; 
+
+
+struct mapData {
+	TileMap* map;
+	TileMap* decorations;
+	Object* object; 
+	std::vector<Enemy*> enemies;
+	std::vector<Object*> objects;
+};
 
 
 const float GRAVITY = 500.0f; // Determined gravity for our world
 const float MIN_FALL_VELOCITY = 70.0f; // Min falling vel 
 
 
-#pragma once
 class MovableEntity
 {
 public:
-	virtual void init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) = 0;
+	virtual void init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) = 0; 
 	virtual void update(int deltaTime);
-	void render();
+	virtual void render();
 
-	bool checkCollision(MovableEntity* other);
+	void changeAnimation(int animation);
+	bool checkCollision(MovableEntity* other, float* posY, bool bot_or_top, const bool correctPos = true);
+	Object* checkCollisionEntities(std::vector<Object*> entities, bool bot_or_top, bool correctPos = true);
+	Enemy* checkCollisionEntities(std::vector<Enemy*> entities, bool bot_or_top, bool correctPos = true);
 
 	void setStatic();
-	void setTileMap(TileMap* tileMap);
+	void setTileMap(mapData* tileMap);
 	void setPosition(const glm::vec2& position);
 	glm::vec2 getPosition() const { return pos; };
 	glm::vec2 getVelocity() const { return vel; };
@@ -34,7 +50,9 @@ protected:
 
 	glm::vec2 pos, vel, avgVel;
 	glm::ivec2 size, hitBox, hitBoxOffset;
-	bool moving, falling, isStatic, horizontalCollision, verticalCollision;
+	bool moving, falling, isStatic, horizontalCollision, topCollision, downCollision;
+	Enemy* collidedEnemy;
+	Object* collidedObject;
 	virtual void calculateVelocity(int deltaTime); 
 	virtual void otherChanges();
 	virtual void recalculatePos(const glm::vec2& velStart);
@@ -54,7 +72,7 @@ protected:
 	glm::ivec2 tileMapDispl;
 	Texture spritesheet;
 	Sprite* sprite;
-	TileMap* map;
+	mapData* map;
 };
 
 
