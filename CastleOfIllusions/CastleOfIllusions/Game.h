@@ -3,7 +3,6 @@
 
 
 #include <GLFW/glfw3.h>
-#include "Scene.h"
 #include "Interface.h"
 
 
@@ -16,10 +15,6 @@
 
 class Game
 {
-
-private:
-	Game() {}
-	
 public:
 	static Game &instance()
 	{
@@ -27,6 +22,9 @@ public:
 	
 		return G;
 	}
+
+	Game();
+	~Game();
 	
 	void init();
 	bool update(int deltaTime);
@@ -42,12 +40,10 @@ public:
 	bool getKey(int key) const;
 
 private:
-	bool bPlay; // Continue to play game?
+	bool bPlay = true; // Continue to play game?
 	bool keys[GLFW_KEY_LAST+1]; // Store key states so that 
 							    // we can have access at any time
-	Scene scene;
-	Interface* currentScreen;
-
+	Scene* mainScreen, * menuScreen, * gameScreen, * currentScreen;
 };
 
 

@@ -22,9 +22,12 @@ void MovableEntity::update(int deltaTime)
 {
 	glm::vec2 velStart = vel;
 
-	if (!isStatic) {
+	if (!isStatic && map != NULL)
 		calculateVelocity(deltaTime);
-		changeAnimations(deltaTime);
+	
+	changeAnimations(deltaTime);
+
+	if (!isStatic && map != NULL) {
 		recalculatePos(velStart);
 		otherChanges();
 		sprite->setPosition(glm::vec2(float(tileMapDispl.x + pos.x), float(tileMapDispl.y + pos.y)));

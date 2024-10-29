@@ -243,6 +243,9 @@ void Player::changeAnimation(PlayerAnims animation)
 void Player::changeAnimations(int deltaTime)
 {
 	sprite->update(deltaTime);
+	
+	if (isStatic)
+		return; 
 
 	if (!moving && !stopping && !falling && !crouching)
 	{

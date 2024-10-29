@@ -4,28 +4,37 @@
 #include "Interface.h"
 
 
+Game::Game() 
+{
+
+}
+
+Game::~Game()
+{
+	delete mainScreen;
+	delete menuScreen;
+	delete gameScreen;
+}
+
 void Game::init()
 {
 	bPlay = true;
 	glClearColor(0.0f, 0.67f, 1.0f, 1.0f);
-	//scene.init();
-	currentScreen = new MainScreen();  // Aquí puedes usar el puntero de tipo Interface*
-	currentScreen->init();  // Llamamos al método init() de MainScreen
+	mainScreen = new MainScreen();
+	menuScreen = new MenuScreen();
+	gameScreen = new GameScene(); 
+	currentScreen = mainScreen;  // Aquí puedes usar el puntero de tipo Interface
 }
 
 bool Game::update(int deltaTime)
 {
-	//scene.update(deltaTime);
-
 	currentScreen->update(deltaTime);
-
 	return bPlay;
 }
 
 void Game::render()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	//scene.render();
 	currentScreen->render();
 }
 
@@ -33,6 +42,13 @@ void Game::keyPressed(int key)
 {
 	if(key == GLFW_KEY_ESCAPE) // Escape code
 		bPlay = false;
+	if (key == GLFW_KEY_SPACE)  // Space key switches screens
+	{
+		if (currentScreen == mainScreen)
+			currentScreen = gameScreen;
+		else
+			currentScreen = mainScreen;
+	}
 	keys[key] = true;
 }
 

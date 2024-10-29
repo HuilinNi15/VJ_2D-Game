@@ -32,6 +32,8 @@ Sprite::Sprite(const glm::vec2 &quadSize, const glm::vec2 &sizeInSpritesheet, Te
 	shaderProgram = program;
 	currentAnimation = -1;
 	position = glm::vec2(0.f);
+	currentKeyframe = 0; 
+	timeAnimation = 0.0f; 
 }
 
 void Sprite::update(int deltaTime)

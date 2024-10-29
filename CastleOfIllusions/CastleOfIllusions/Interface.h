@@ -1,49 +1,100 @@
 #ifndef _INTERFACE_INCLUDE
 #define _INTERFACE_INCLUDE
 
-#include "Scene.h"
+#include <glm/glm.hpp>
+#include "ShaderProgram.h"
+#include "TileMap.h"
 #include "Texture.h"
 #include "Sprite.h"
 #include "Player.h"
 
-class Interface : public Scene {
+
+#define SCREEN_X 0
+#define SCREEN_Y 0
+
+#define INIT_PLAYER_X_TILES 1
+#define INIT_PLAYER_Y_TILES 5
+
+#define CAMERA_WIDTH 256
+#define CAMERA_HEIGHT 192
+
+#define DEAD_ZONE_SIZE 4.0f
+
+
+class Scene {
 public:
-    virtual void init() override;
+    Scene();
+    ~Scene(); 
+    virtual void update(int deltaTime);
+    virtual void render();
+
+protected:
+    void initShaders();
+
+    ShaderProgram texProgram;
+    float currentTime;
+    glm::mat4 projection;
+};
+
+
+
+class GameScene : public Scene {
+public:
+    GameScene();
+    ~GameScene();
+
     virtual void update(int deltaTime) override;
     virtual void render() override;
 
-protected:
-    Texture backgroundTexture;
-    std::string title;
+private:
+    void updateCam(int deltaTime);
+
+    float cameraX = 0.0f;
+    float cameraSpeed = 10.0f;
+
+    TileMap* map;
+    TileMap* decorations; 
+    Player* player;
 };
 
-class MainScreen : public Interface {
+
+
+class MenuScreen : public Scene {
 public:
-    void init() override;
+    MenuScreen();
+    ~MenuScreen();
+
     void update(int deltaTime) override;
     void render() override;
 
 private:
-    Texture backgroundTexture;
-    //Sprite* titleSprite; // To hold the title sprite
-    Player* mickeySprite; // To hold the Mickey sprite
-    //glm::vec2 titlePosition; // Position for the title
-    glm::vec2 mickeyPosition; // Position for Mickey
+    int selectedOption; 
 };
 
-class MenuScreen : public Interface {
+
+
+class MainScreen : public Scene {
 public:
-    void init() override;
+    MainScreen();
+    ~MainScreen();
+
     void update(int deltaTime) override;
     void render() override;
 
 private:
-    int selectedOption; // Track selected level
+    Texture backgroundTexture; 
+    Sprite* backgroundSprite; 
+    Player* mickeySprite;
+    glm::vec2 mickeyPosition;
 };
 
-class CreditsScreen : public Interface {
+
+
+class CreditsScreen : public Scene {
 public:
-    void init() override;
+    CreditsScreen();
+    ~CreditsScreen(); 
+
     void update(int deltaTime) override;
     void render() override;
 
@@ -51,14 +102,19 @@ private:
     // Additional attributes for credits
 };
 
-class InstructionsScreen : public Interface {
+
+
+class InstructionsScreen : public Scene {
 public:
-    void init() override;
+    InstructionsScreen();
+    ~InstructionsScreen();
+
     void update(int deltaTime) override;
     void render() override;
 
 private:
     // Additional attributes for instructions
 };
+
 
 #endif // _INTERFACE_INCLUDE

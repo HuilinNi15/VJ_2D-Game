@@ -37,6 +37,7 @@ class Player: public MovableEntity
 
 public:
 	void init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram) override;
+	void changeAnimation(PlayerAnims animation);
 
 private:
 	void handleMove(float direction);
@@ -44,7 +45,6 @@ private:
 	void handleCrouch();
 	void calculateVelocity(int deltaTime) override;
 	void otherChanges() override;
-	void changeAnimation(PlayerAnims animation);
 	void changeAnimations(int deltaTime) override;
 
 	bool facingRight = true; // if false, then facingLeft
