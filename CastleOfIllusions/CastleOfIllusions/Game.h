@@ -6,8 +6,8 @@
 #include "Interface.h"
 
 
-#define SCREEN_WIDTH 256 * 4
-#define SCREEN_HEIGHT 192 * 4
+#define SCREEN_WIDTH 256 * 5
+#define SCREEN_HEIGHT 192 * 5
 
 
 // Game is a singleton (a class with a single instance) that represents our whole application
@@ -43,7 +43,7 @@ private:
 	bool bPlay = true; // Continue to play game?
 	bool keys[GLFW_KEY_LAST+1]; // Store key states so that 
 							    // we can have access at any time
-	Scene* mainScreen, * menuScreen, * gameScreen, * currentScreen;
+	Scene* mainScreen, * menuScreen, * gameScreen, * currentScreen, * instructionsScreen, * creditsScreen;
 };
 
 

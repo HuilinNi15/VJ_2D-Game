@@ -126,7 +126,7 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 		sprite->addKeyframe(ALMOST_FALLING_RIGHT, glm::vec2(x * 9.f, y * 2.f));
 		sprite->addKeyframe(ALMOST_FALLING_RIGHT, glm::vec2(x * 10.f, y * 2.f));
 
-		sprite->setAnimationSpeed(WAVING_HAND, 8);
+		sprite->setAnimationSpeed(WAVING_HAND, 4);
 		sprite->addKeyframe(WAVING_HAND, glm::vec2(x * 12, y * 2));
 		sprite->addKeyframe(WAVING_HAND, glm::vec2(x * 13, y * 2));
 		sprite->addKeyframe(WAVING_HAND, glm::vec2(x * 14, y * 2));
