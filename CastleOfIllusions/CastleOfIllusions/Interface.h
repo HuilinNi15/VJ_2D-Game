@@ -93,11 +93,14 @@ public:
     void update(int deltaTime) override;
     void render() override;
 
-private:
+protected:
     Texture backgroundTexture;
     Sprite* backgroundSprite;
     Player* mickeySprite;
     glm::vec2 mickeyPosition;
+
+    Texture textTexture;
+    Sprite* textSprite;
 }; 
 
 

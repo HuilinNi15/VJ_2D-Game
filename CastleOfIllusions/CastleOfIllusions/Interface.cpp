@@ -189,12 +189,26 @@ MainScreen::MainScreen()
 	mickeySprite->init(glm::ivec2(112, 128), texProgram); // Mickey sprite position
 	mickeySprite->changeAnimation(WAVING_HAND); // Waving animation
 	mickeySprite->setStatic();
+
+	// Load the text texture
+	textTexture.loadFromFile("images/screens/press_spacebar_MainScreen.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	textTexture.setMinFilter(GL_NEAREST);
+	textTexture.setMagFilter(GL_NEAREST);
+
+	// Create the text sprite
+	textSprite = Sprite::createSprite(glm::ivec2(52, 28), glm::vec2(1.0f, 1.0f), &textTexture, &texProgram);
+	textSprite->setNumberAnimations(1);
+	textSprite->setAnimationSpeed(0, 1);
+	textSprite->addKeyframe(0, glm::vec2(0.f, 0.f));
+	textSprite->changeAnimation(0);
+	textSprite->setPosition(glm::vec2(176.f, 120.f)); // Position the background at (0, 0)
 }
 
 MainScreen::~MainScreen()
 {
     delete backgroundSprite;
     delete mickeySprite;
+	delete textSprite;
 }
 
 void MainScreen::update(int deltaTime) 
@@ -208,6 +222,7 @@ void MainScreen::render()
 	Scene::render();
     backgroundSprite->render();
 	mickeySprite->render();
+	textSprite->render();
 }
 
 
