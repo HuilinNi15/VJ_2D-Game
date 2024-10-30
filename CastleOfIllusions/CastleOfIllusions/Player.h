@@ -43,21 +43,6 @@ class Player: public MovableEntity
 
 public:
 	void init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram) override;
-	void changeAnimation(PlayerAnims animation);
-
-	int getLives() { return lives; };
-
-	std::string getTries() const {
-		std::ostringstream oss;
-		oss << std::setw(2) << std::setfill('0') << tries;  // Pads with '0' to a width of 2
-		return oss.str();
-	}
-
-	std::string getScore() const {
-		std::ostringstream oss;
-		oss << std::setw(6) << std::setfill('0') << score;  // Pads with '0' to a width of 6
-		return oss.str();
-	}
 
 	int getLives() { return lives; };
 
