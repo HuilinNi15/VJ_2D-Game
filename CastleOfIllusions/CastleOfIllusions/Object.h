@@ -2,54 +2,68 @@
 #define _OBJECT_INCLUDE
 
 
+#pragma once
 #include "Sprite.h"
-#include "TileMap.h"
 #include "MovableEntity.h"
 #include "Player.h"
 
 
-#pragma once
+const glm::vec2 THROW_VEL = glm::vec2(150.0f, 100.0f); 
+const glm::vec2 BOUNCE_VEL1 = glm::vec2(75.0f, 50); 
+const glm::vec2 BOUNCE_VEL2 = glm::vec2(35.0f, 25.0f);
+
+
+enum ObjectAnimations {
+    STATIC, BREAK
+};
+
+
 class Object: public MovableEntity
 {
 public:
+    virtual void init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) = 0; 
     virtual void pickUp(Player* player);
     virtual void throwObject();
     virtual void breakObject();
 
+    void render() override; 
+
 protected:
+    virtual void changeAnimations(int deltaTime) = 0;
+
+    Player* pickedUpBy;
     bool isBroken = false; // Track if the object is broken
 };
 
 
 class Stone : public Object {
 public:
-    void throwObject() override {
-        // Logic for throwing a stone
-        isBroken = true; // Stone breaks when thrown
-    }
+    void init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) override;
+
+protected: 
+    void changeAnimations(int deltaTime) override;
 };
 
 
 class Chest : public Object {
 public:
-    void throwObject() override {
-        isBroken = true; // Chess piece breaks when thrown
-        releaseObject(); // Releases an object upon breaking
-    }
+    void init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) override; 
+    void breakObject() override;
 
-private:
-    void releaseObject() {
-        // Logic to release an object
-    }
+protected:
+    void changeAnimations(int deltaTime) override;
+    void releaseObject(); 
 };
 
 
 class Barrel : public Object {
 public:
-    void throwObject() override {
-        // Logic for throwing a box
-        // Box does not break; simply remains in the world
-    }
+    void init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) override; 
+    void breakObject() override;
+
+protected:
+    void changeAnimations(int deltaTime) override;
+    int bounce = 0; 
 };
 
 

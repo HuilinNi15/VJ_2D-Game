@@ -1,3 +1,4 @@
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -15,19 +16,6 @@ TileMap* TileMap::createTileMap(const string& levelFile, const glm::vec2& minCoo
 
 	return map;
 }
-
-//ListOfPointersToEnemy getEnemies(const string& levelFile)
-//{
-//	// search for the line that says Enemies
-//	// create as many instances as lines of enemies there are
-//	// return them in a vector
-//}
-//
-//ListOfPointersToObject getObjects(const string& levelFile)
-//{
-//	// the same but for objects
-//}
-
 
 
 TileMap::TileMap(const string& levelFile, const glm::vec2& minCoords, ShaderProgram& program, bool save_decoration)
@@ -132,15 +120,14 @@ bool TileMap::loadLevel(const string& levelFile, bool save_decoration)
 		}
 	}
 
-	fin.close();
+	for (int i = 0; i < mapSize.x; ++i) {
+		for (int j = 0; j < mapSize.y; ++j) {
+			std::cout << map[i * mapSize.x + j] << " ";
+		}
+		std::cout << std::endl;
+	}
 
-	//for (int i=0; i<mapSize.y; ++i)
-	//{
-	//	for (int j=0; j<mapSize.x; ++j) {
-	//		cout << map[i*mapSize.x+j] << " ";
-	//	}
-	//	cout << endl;
-	//}
+	fin.close();
 
 	return true;
 }
@@ -193,6 +180,91 @@ void TileMap::prepareArrays(const glm::vec2& minCoords, ShaderProgram& program)
 	posLocation = program.bindVertexAttribute("position", 2, 4 * sizeof(float), 0);
 	texCoordLocation = program.bindVertexAttribute("texCoord", 2, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 }
+
+
+//std::vector<Enemy*> TileMap::getEnemies(const std::string& levelFile, ShaderProgram& program, mapData* map) {
+//	std::ifstream file(levelFile);
+//	std::string line;
+//	std::vector<Enemy*> enemies;
+//	bool inEnemiesSection = false;
+//
+//	if (file.is_open()) {
+//		while (getline(file, line)) {
+//			if (line.find("ENEMIES") != std::string::npos) {
+//				inEnemiesSection = true;
+//				continue;
+//			}
+//			if (inEnemiesSection) {
+//				if (line.empty() || line.find("OBJECTS") != std::string::npos) break;
+//
+//				Enemy* enemy; 
+//				if (line[0] == 1)
+//					enemy = new Enemy1();
+//				else if (line[0] == 2)
+//					enemy = new Enemy2(); 
+//
+//				enemy->init(glm::ivec2(SCREEN_X, SCREEN_Y), program);
+//				enemy->setPosition(glm::vec2(line[1], line[2]));
+//				enemy->setTileMap(map);
+//				 
+//				enemies.push_back(enemy);
+//			}
+//		}
+//		file.close();
+//	}
+//	else {
+//		std::cerr << "Unable to open file: " << levelFile << std::endl;
+//	}
+//	return enemies;
+//}
+
+std::vector<Object*> TileMap::getObjects(const std::string& levelFile, ShaderProgram& program, mapData* map) {
+	std::ifstream file(levelFile);
+	std::string line;
+	std::vector<Object*> objects;
+	bool inObjectsSection = false;
+
+	int tilesize = map->map->getTileSize();
+
+	if (file.is_open()) {
+		while (getline(file, line)) {
+			if (line.find("OBJECTS") != std::string::npos) {
+				inObjectsSection = true;
+				continue;
+			}
+			if (inObjectsSection) {
+				if (line.empty()) break;
+
+				std::istringstream lineStream(line);
+				int id, x, y;
+				lineStream >> id >> x >> y; // Extract ID, x, and y from the line
+
+				Object* object = nullptr;
+				if (id == 1)
+					object = new Barrel();
+				else if (id == 0)
+					object = new Stone();
+				else if (id == 4)
+					object = new Chest();
+
+				if (object) { // Only proceed if object was successfully created
+					object->init(glm::ivec2(SCREEN_X, SCREEN_Y), program);
+					object->setPosition(glm::vec2(tilesize * x, tilesize * y));
+					object->setTileMap(map);
+					objects.push_back(object);
+				}
+			}
+		}
+		file.close();
+	}
+	else {
+		std::cerr << "Unable to open file: " << levelFile << std::endl;
+	}
+	return objects;
+}
+
+
+
 
 // Collision tests for axis aligned bounding boxes.
 // Method collisionMoveDown also corrects Y coordinate if the box is

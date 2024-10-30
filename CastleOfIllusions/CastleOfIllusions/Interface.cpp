@@ -3,7 +3,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <vector>
 #include "Interface.h"
-#include "Player.h"
+#include "Object.h"
 
 
 Scene::Scene()
@@ -70,11 +70,28 @@ GameScene::GameScene(string level)
 {
 	map.map = TileMap::createTileMap(level, glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 	map.decorations = TileMap::createTileMap(level, glm::vec2(SCREEN_X, SCREEN_Y), texProgram, true);
-	
+	//map.enemies = TileMap::getEnemies(level, texProgram);
+	map.objects = TileMap::getObjects(level, texProgram, &map);
+
+	//map.objects = std::vector<Object*>(); // Ensure it's initialized
+	//Chest* chest = new Chest();
+	//chest->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+	//chest->setPosition(glm::vec2(85, 80));
+	//chest->setTileMap(&map);
+	//chest->setStatic();
+	//map.objects.push_back(chest);
+
+	//Stone* chest2 = new Stone();
+	//chest2->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+	//chest2->setPosition(glm::vec2(120, 70));
+	//chest2->setTileMap(&map);
+	//chest2->setStatic(); 
+	//map.objects.push_back(chest2);
+
 	player = new Player();
 	player->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
-	player->setPosition(glm::vec2(INIT_PLAYER_X_TILES * map.map->getTileSize(), INIT_PLAYER_Y_TILES * map.map->getTileSize()));
-	player->setTileMap(map.map);
+	player->setPosition(glm::vec2(map.map->getTileSize() * INIT_PLAYER_X_TILES, map.map->getTileSize() * INIT_PLAYER_Y_TILES)); 
+	player->setTileMap(&map);
 
 	// Load the Life Bar texture
 	lifeBarTexture.loadFromFile("images/screens/LifeBar.png", TEXTURE_PIXEL_FORMAT_RGBA);
@@ -119,6 +136,12 @@ GameScene::~GameScene()
 	delete player;
 
 	delete lifeBarSprite;
+	for (Object* entity : map.objects) {
+		delete entity; 
+	}
+	for (Enemy* entity : map.enemies) {
+		delete entity;
+	}
 }
 
 void GameScene::updateCam(int deltaTime)
@@ -159,6 +182,12 @@ void GameScene::update(int deltaTime)
 {
 	Scene::update(deltaTime);
 	player->update(deltaTime);
+	for (Object* entity : map.objects) {
+		entity->update(deltaTime);
+	}
+	for (Enemy* entity : map.enemies) {
+		entity->update(deltaTime);
+	}
 	updateCam(deltaTime);
 
 	lifeBarSprite->changeAnimation(player->getLives());
@@ -169,6 +198,12 @@ void GameScene::render()
 	Scene::render();
 	map.decorations->render();
 	map.map->render();
+	for (Object* entity : map.objects) {
+		entity->render();
+	}
+	for (Enemy* entity : map.enemies) {
+		entity->render();
+	}
 	player->render();
 
 	lifeBarSprite->render();

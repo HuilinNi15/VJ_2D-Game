@@ -57,7 +57,7 @@ void Game::keyPressed(int key)
 
 			if (selectedOption == 0)
 			{
-				gameScreen = new GameScene("levels/forest_practice_map.txt");
+				gameScreen = new GameScene("levels/forest_map_prueba.txt");
 				currentScreen = gameScreen;
 			}
 			else if (selectedOption == 1)
