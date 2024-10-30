@@ -32,7 +32,7 @@ void Game::init()
 	if (!engine) {
 		std::cerr << "Unable to create engine" << std::endl;
 	}
-	engine->play2D("media/getout.ogg", true); // true = set audio into a loop
+	engine->play2D("media/IntroTheme.ogg", true); // true = set audio into a loop
 
 	mainScreen = new MainScreen();
 	menuScreen = new MenuScreen();
