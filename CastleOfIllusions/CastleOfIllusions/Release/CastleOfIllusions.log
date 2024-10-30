@@ -1,0 +1,29 @@
+﻿  Enemy.cpp
+  Game.cpp
+  Interface.cpp
+  main.cpp
+  MovableEntity.cpp
+  Object.cpp
+  Player.cpp
+  Quad.cpp
+  Shader.cpp
+  ShaderProgram.cpp
+  Sprite.cpp
+  Text.cpp
+  Texture.cpp
+  TexturedQuad.cpp
+  TileMap.cpp
+C:\Users\huili\Downloads\VJ_2D-Game\CastleOfIllusions\CastleOfIllusions\TileMap.cpp(340,36): warning C4244: '=': conversion from 'T' to 'float', possible loss of data
+C:\Users\huili\Downloads\VJ_2D-Game\CastleOfIllusions\CastleOfIllusions\TileMap.cpp(340,36): warning C4244:         with
+C:\Users\huili\Downloads\VJ_2D-Game\CastleOfIllusions\CastleOfIllusions\TileMap.cpp(340,36): warning C4244:         [
+C:\Users\huili\Downloads\VJ_2D-Game\CastleOfIllusions\CastleOfIllusions\TileMap.cpp(340,36): warning C4244:             T=int
+C:\Users\huili\Downloads\VJ_2D-Game\CastleOfIllusions\CastleOfIllusions\TileMap.cpp(340,36): warning C4244:         ]
+C:\Users\huili\Downloads\VJ_2D-Game\CastleOfIllusions\CastleOfIllusions\TileMap.cpp(368,38): warning C4244: '=': conversion from 'T' to 'float', possible loss of data
+C:\Users\huili\Downloads\VJ_2D-Game\CastleOfIllusions\CastleOfIllusions\TileMap.cpp(368,38): warning C4244:         with
+C:\Users\huili\Downloads\VJ_2D-Game\CastleOfIllusions\CastleOfIllusions\TileMap.cpp(368,38): warning C4244:         [
+C:\Users\huili\Downloads\VJ_2D-Game\CastleOfIllusions\CastleOfIllusions\TileMap.cpp(368,38): warning C4244:             T=int
+C:\Users\huili\Downloads\VJ_2D-Game\CastleOfIllusions\CastleOfIllusions\TileMap.cpp(368,38): warning C4244:         ]
+SOIL.lib(SOIL.obj) : warning LNK4075: ignoring '/EDITANDCONTINUE' due to '/OPT:ICF' specification
+LINK : warning LNK4098: defaultlib 'MSVCRTD' conflicts with use of other libs; use /NODEFAULTLIB:library
+Game.obj : error LNK2001: unresolved external symbol "__declspec(dllimport) class irrklang::ISoundEngine * __cdecl irrklang::createIrrKlangDevice(enum irrklang::E_SOUND_OUTPUT_DRIVER,int,char const *,char const *)" (__imp_?createIrrKlangDevice@irrklang@@YAPAVISoundEngine@1@W4E_SOUND_OUTPUT_DRIVER@1@HPBD1@Z)
+C:\Users\huili\Downloads\VJ_2D-Game\CastleOfIllusions\Release\Game.exe : fatal error LNK1120: 1 unresolved externals

@@ -164,6 +164,7 @@ void GameScene::update(int deltaTime)
 	updateCam(deltaTime);
 
 	lifeBarSprite->changeAnimation(player->getLives());
+	lifeBarSprite->setPosition(glm::vec2(cameraX, 160.f));
 }
 
 void GameScene::render()

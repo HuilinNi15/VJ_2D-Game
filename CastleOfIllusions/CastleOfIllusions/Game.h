@@ -42,7 +42,7 @@ public:
 
 	bool getKey(int key) const;
 
-	ISoundEngine* engine;
+	ISoundEngine* engine = createIrrKlangDevice();
 
 private:
 	bool bPlay = true; // Continue to play game?
