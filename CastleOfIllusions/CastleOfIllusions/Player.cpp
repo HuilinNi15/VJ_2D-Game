@@ -15,7 +15,7 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 	float x = 0.0625; 
 	float y = 0.125;
 
-	animations.resize(19);
+	animations.resize(30);
 
 	size = glm::ivec2(32, 48);
 
@@ -24,20 +24,30 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 	addAnimation(MOVE_LEFT, size, glm::ivec2(20, 30), glm::ivec2(6, 18));
 	addAnimation(MOVE_RIGHT, size, glm::ivec2(20, 30), glm::ivec2(6, 18));
 	addAnimation(JUMP_LEFT, size, glm::ivec2(20, 31), glm::ivec2(6, 17));
+
 	addAnimation(JUMP_RIGHT, size, glm::ivec2(20, 31), glm::ivec2(6, 17));
 	addAnimation(BUTT_ATTACK_LEFT, size, glm::ivec2(20, 26), glm::ivec2(6, 22));
 	addAnimation(BUTT_ATTACK_RIGHT, size, glm::ivec2(20, 26), glm::ivec2(6, 22));
 	addAnimation(BUTT_FALL_LEFT, size, glm::ivec2(20, 23), glm::ivec2(6, 25));
 	addAnimation(BUTT_FALL_RIGHT, size, glm::ivec2(20, 23), glm::ivec2(6, 25));
+
 	addAnimation(STOP_RIGHT, size, glm::ivec2(20, 28), glm::ivec2(6, 20));
 	addAnimation(STOP_LEFT, size, glm::ivec2(20, 28), glm::ivec2(6, 20));
 	addAnimation(CROUCH_DOWN_LEFT, size, glm::ivec2(18, 20), glm::ivec2(7, 28));
 	addAnimation(CROUCH_DOWN_RIGHT, size, glm::ivec2(18, 20), glm::ivec2(7, 28));
-	addAnimation(PREPARE_PICKUP_LEFT, size, glm::ivec2(18, 20), glm::ivec2(7, 28));
-	addAnimation(PREPARE_PICKUP_RIGHT, size, glm::ivec2(18, 20), glm::ivec2(7, 28));
-	addAnimation(ALMOST_FALLING_LEFT, size, glm::ivec2(9, 20), glm::ivec2(16, 28));
-	addAnimation(ALMOST_FALLING_RIGHT, size, glm::ivec2(9, 20), glm::ivec2(7, 28));
+	addAnimation(PREPARE_PICKUP_LEFT, size, glm::ivec2(20, 30), glm::ivec2(6, 18));
+
+	addAnimation(PREPARE_PICKUP_RIGHT, size, glm::ivec2(20, 30), glm::ivec2(6, 18));
+	addAnimation(ALMOST_FALLING_LEFT, size, glm::ivec2(9, 30), glm::ivec2(16, 18));
+	addAnimation(ALMOST_FALLING_RIGHT, size, glm::ivec2(9, 30), glm::ivec2(7, 18));
 	addAnimation(WAVING_HAND, size, glm::ivec2(20, 30), glm::ivec2(6, 18));
+	addAnimation(CARRY_STAND_LEFT, size, glm::ivec2(20, 30), glm::ivec2(6, 18));
+
+	addAnimation(CARRY_STAND_RIGHT, size, glm::ivec2(20, 30), glm::ivec2(6, 18));
+	addAnimation(CARRY_MOVE_LEFT, size, glm::ivec2(20, 30), glm::ivec2(6, 18));
+	addAnimation(CARRY_MOVE_RIGHT, size, glm::ivec2(20, 30), glm::ivec2(6, 18));
+	addAnimation(CARRY_JUMP_LEFT, size, glm::ivec2(20, 30), glm::ivec2(6, 18));
+	addAnimation(CARRY_JUMP_RIGHT, size, glm::ivec2(20, 30), glm::ivec2(6, 18));
 
 	sprite = Sprite::createSprite(size, glm::vec2(x, y), &spritesheet, &shaderProgram);
 	sprite->setNumberAnimations(animations.size());
@@ -132,6 +142,38 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 		sprite->addKeyframe(WAVING_HAND, glm::vec2(x * 14, y * 2));
 		sprite->addKeyframe(WAVING_HAND, glm::vec2(x * 15, y * 2));
 
+		sprite->setAnimationSpeed(CARRY_STAND_LEFT, 4);
+		sprite->addKeyframe(CARRY_STAND_LEFT, glm::vec2(x * 4, y * 5));
+		sprite->addKeyframe(CARRY_STAND_LEFT, glm::vec2(x * 5, y * 5));
+
+		sprite->setAnimationSpeed(CARRY_STAND_RIGHT, 4);
+		sprite->addKeyframe(CARRY_STAND_RIGHT, glm::vec2(x * 4, y * 4));
+		sprite->addKeyframe(CARRY_STAND_RIGHT, glm::vec2(x * 5, y * 4));
+
+		sprite->setAnimationSpeed(CARRY_MOVE_LEFT, 25);
+		sprite->addKeyframe(CARRY_MOVE_LEFT, glm::vec2(x * 6, y * 7));
+		sprite->addKeyframe(CARRY_MOVE_LEFT, glm::vec2(x * 1, y * 7));
+		sprite->addKeyframe(CARRY_MOVE_LEFT, glm::vec2(x * 2, y * 7));
+		sprite->addKeyframe(CARRY_MOVE_LEFT, glm::vec2(x * 7, y * 7));
+		sprite->addKeyframe(CARRY_MOVE_LEFT, glm::vec2(x * 4, y * 7));
+		sprite->addKeyframe(CARRY_MOVE_LEFT, glm::vec2(x * 5, y * 7));
+
+		sprite->setAnimationSpeed(CARRY_MOVE_RIGHT, 25);
+		sprite->addKeyframe(CARRY_MOVE_RIGHT, glm::vec2(x * 6, y * 6));
+		sprite->addKeyframe(CARRY_MOVE_RIGHT, glm::vec2(x * 1, y * 6));
+		sprite->addKeyframe(CARRY_MOVE_RIGHT, glm::vec2(x * 2, y * 6));
+		sprite->addKeyframe(CARRY_MOVE_RIGHT, glm::vec2(x * 7, y * 6));
+		sprite->addKeyframe(CARRY_MOVE_RIGHT, glm::vec2(x * 4, y * 6));
+		sprite->addKeyframe(CARRY_MOVE_RIGHT, glm::vec2(x * 5, y * 6));
+
+		sprite->setAnimationSpeed(CARRY_JUMP_LEFT, 4);
+		sprite->addKeyframe(CARRY_JUMP_LEFT, glm::vec2(x * 8, y * 7));
+		sprite->addKeyframe(CARRY_JUMP_LEFT, glm::vec2(x * 9, y * 7));
+
+		sprite->setAnimationSpeed(CARRY_JUMP_RIGHT, 4);
+		sprite->addKeyframe(CARRY_JUMP_RIGHT, glm::vec2(x * 8, y * 6));
+		sprite->addKeyframe(CARRY_JUMP_RIGHT, glm::vec2(x * 9, y * 6));
+
 	tileMapDispl = tileMapPos;
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + pos.x), float(tileMapDispl.y + pos.y)));
 
@@ -225,7 +267,7 @@ void Player::handleCrouch()
 void Player::otherChanges()
 {
 	if (topCollision)
-		attacking = false; 
+		attacking = false;
 
 	if (Game::instance().getKey(GLFW_KEY_E))
 	{
@@ -258,47 +300,86 @@ void Player::changeAnimations(int deltaTime)
 
 	if (!moving && !stopping && !falling && !crouching)
 	{
-		pos.y += MIN_FALL_VELOCITY * dt;
-		updateHitBox(ALMOST_FALLING_LEFT);
-		if (!map->map->collisionMoveDown(pos, hitBox, hitBoxOffset, &pos.y, false))
+		if (carrying)
 		{
-			changeAnimation(ALMOST_FALLING_LEFT);
-			updateHitBox(STAND_LEFT);
+			if (facingRight) {
+				changeAnimation(CARRY_STAND_RIGHT);
+				updateHitBox(CARRY_STAND_RIGHT);
+			}
+			else {
+				changeAnimation(CARRY_STAND_LEFT);
+				updateHitBox(CARRY_STAND_LEFT);
+			}
 		}
 		else
 		{
-			updateHitBox(ALMOST_FALLING_RIGHT);
-			if (!map->map->collisionMoveDown(pos, hitBox, hitBoxOffset, &pos.y, false))
+			pos.y += MIN_FALL_VELOCITY * dt;
+			updateHitBox(ALMOST_FALLING_LEFT);
+			if (!map->map->collisionMoveDown(pos, hitBox, hitBoxOffset, &pos.y, false) && !checkCollisionEntities(map->objects, true, false))
 			{
-				changeAnimation(ALMOST_FALLING_RIGHT);
-				updateHitBox(STAND_RIGHT);
+				changeAnimation(ALMOST_FALLING_LEFT);
+				updateHitBox(STAND_LEFT);
 			}
 			else
 			{
-				if (facingRight) {
-					changeAnimation(STAND_RIGHT);
+				updateHitBox(ALMOST_FALLING_RIGHT);
+				if (!map->map->collisionMoveDown(pos, hitBox, hitBoxOffset, &pos.y, false) && !checkCollisionEntities(map->objects, true, false))
+				{
+					changeAnimation(ALMOST_FALLING_RIGHT);
 					updateHitBox(STAND_RIGHT);
 				}
-				else {
-					changeAnimation(STAND_LEFT);
-					updateHitBox(STAND_LEFT);
+				else
+				{
+					if (facingRight) {
+						changeAnimation(STAND_RIGHT);
+						updateHitBox(STAND_RIGHT);
+					}
+					else {
+						changeAnimation(STAND_LEFT);
+						updateHitBox(STAND_LEFT);
+					}
 				}
 			}
+			pos.y -= MIN_FALL_VELOCITY * dt;
 		}
-		pos.y -= MIN_FALL_VELOCITY * dt;
+	}
+
+	else if (moving && !falling && collidedObject && vel == glm::vec2(20.f, 0.f))
+	{
+		if (facingRight) {
+			changeAnimation(PREPARE_PICKUP_RIGHT);
+			updateHitBox(PREPARE_PICKUP_RIGHT);
+		}
+		else {
+			changeAnimation(PREPARE_PICKUP_RIGHT);
+			updateHitBox(PREPARE_PICKUP_RIGHT);
+		}
 	}
 
 	else if (moving && !falling)
 	{
-		if (facingRight) {
-			changeAnimation(MOVE_RIGHT);
-			updateHitBox(MOVE_RIGHT);
+		if (carrying)
+		{
+			if (facingRight) {
+				changeAnimation(CARRY_MOVE_RIGHT);
+				updateHitBox(CARRY_MOVE_RIGHT);
+			}
+			else {
+				changeAnimation(CARRY_MOVE_LEFT);
+				updateHitBox(CARRY_MOVE_LEFT);
+			}
 		}
-			
-		else {
-			changeAnimation(MOVE_LEFT);
-			updateHitBox(MOVE_LEFT);
-		}	
+		else
+		{
+			if (facingRight) {
+				changeAnimation(MOVE_RIGHT);
+				updateHitBox(MOVE_RIGHT);
+			}
+			else {
+				changeAnimation(MOVE_LEFT);
+				updateHitBox(MOVE_LEFT);
+			}
+		}
 	}
 
 	else if (stopping && !falling && !crouching)
@@ -327,13 +408,27 @@ void Player::changeAnimations(int deltaTime)
 
 	else if (falling && !attacking)
 	{
-		if (facingRight) {
-			changeAnimation(JUMP_RIGHT);
-			updateHitBox(JUMP_RIGHT);
+		if (carrying)
+		{
+			if (facingRight) {
+				changeAnimation(CARRY_JUMP_RIGHT);
+				updateHitBox(CARRY_JUMP_RIGHT);
+			}
+			else {
+				changeAnimation(CARRY_JUMP_LEFT);
+				updateHitBox(CARRY_JUMP_LEFT);
+			}
 		}
-		else {
-			changeAnimation(JUMP_LEFT);
-			updateHitBox(JUMP_LEFT);
+		else
+		{
+			if (facingRight) {
+				changeAnimation(JUMP_RIGHT);
+				updateHitBox(JUMP_RIGHT);
+			}
+			else {
+				changeAnimation(JUMP_LEFT);
+				updateHitBox(JUMP_LEFT);
+			}
 		}
 	}
 

@@ -29,8 +29,11 @@ void MovableEntity::update(int deltaTime)
 	dt = deltaTime / 1000.0f;
 
 	if (!isStatic && map->map != NULL)
+	{
 		calculateVelocity(deltaTime);
-	
+		//std::cout << vel.x << " " << vel.y << std::endl; 
+	}
+		
 	changeAnimations(deltaTime);
 
 	if (!isStatic && map->map != NULL)
@@ -55,14 +58,13 @@ void MovableEntity::recalculatePos(const glm::vec2& velStart)
 {
 	avgVel.x = (velStart.x + vel.x) / 2.0f;
 	pos.x += avgVel.x * dt;
-
 	horizontalCollision = false; 
 	if (vel.x > 0.0f)
 		horizontalCollision = map->map->collisionMoveRight(pos, hitBox, hitBoxOffset);
 	else if (vel.x < 0.0f)
 		horizontalCollision = map->map->collisionMoveLeft(pos, hitBox, hitBoxOffset);
 	
-	if (!horizontalCollision && vel.x != 0.0f) {
+	if (!horizontalCollision && avgVel.x != 0.0f) {
 		collidedEnemy = checkCollisionEntities(map->enemies, false);
 		collidedObject = checkCollisionEntities(map->objects, false); 
 
@@ -110,7 +112,6 @@ void MovableEntity::recalculatePos(const glm::vec2& velStart)
 
 		if (collidedObject)
 		{
-			std::cout << "COLLIDE" << std::endl;
 			if (vel.y >= 0)
 				falling = false;
 			vel.y = 0.0f;

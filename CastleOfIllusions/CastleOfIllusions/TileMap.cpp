@@ -120,12 +120,12 @@ bool TileMap::loadLevel(const string& levelFile, bool save_decoration)
 		}
 	}
 
-	for (int i = 0; i < mapSize.x; ++i) {
-		for (int j = 0; j < mapSize.y; ++j) {
-			std::cout << map[i * mapSize.x + j] << " ";
-		}
-		std::cout << std::endl;
-	}
+	//for (int i = 0; i < mapSize.x; ++i) {
+	//	for (int j = 0; j < mapSize.y; ++j) {
+	//		std::cout << map[i * mapSize.x + j] << " ";
+	//	}
+	//	std::cout << std::endl;
+	//}
 
 	fin.close();
 

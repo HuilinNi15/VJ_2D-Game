@@ -73,21 +73,6 @@ GameScene::GameScene(string level)
 	//map.enemies = TileMap::getEnemies(level, texProgram);
 	map.objects = TileMap::getObjects(level, texProgram, &map);
 
-	//map.objects = std::vector<Object*>(); // Ensure it's initialized
-	//Chest* chest = new Chest();
-	//chest->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
-	//chest->setPosition(glm::vec2(85, 80));
-	//chest->setTileMap(&map);
-	//chest->setStatic();
-	//map.objects.push_back(chest);
-
-	//Stone* chest2 = new Stone();
-	//chest2->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
-	//chest2->setPosition(glm::vec2(120, 70));
-	//chest2->setTileMap(&map);
-	//chest2->setStatic(); 
-	//map.objects.push_back(chest2);
-
 	player = new Player();
 	player->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 	player->setPosition(glm::vec2(map.map->getTileSize() * INIT_PLAYER_X_TILES, map.map->getTileSize() * INIT_PLAYER_Y_TILES)); 
@@ -191,6 +176,7 @@ void GameScene::update(int deltaTime)
 	updateCam(deltaTime);
 
 	lifeBarSprite->changeAnimation(player->getLives());
+	lifeBarSprite->setPosition(glm::vec2(cameraX, 160.f));
 }
 
 void GameScene::render()

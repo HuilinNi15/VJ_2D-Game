@@ -82,7 +82,7 @@ public:
 private:
     void updateCam(int deltaTime);
 
-    float cameraX = 0.0f;
+    float cameraX = 0.0f; 
     float cameraSpeed = 10.0f;
 
     Player* player;
