@@ -5,6 +5,9 @@
 #include <GLFW/glfw3.h>
 #include "Interface.h"
 
+#include <irrKlang.h>
+using namespace irrklang;
+
 
 #define SCREEN_WIDTH 256 * 5
 #define SCREEN_HEIGHT 192 * 5
@@ -38,6 +41,8 @@ public:
 	void mouseRelease(int button);
 
 	bool getKey(int key) const;
+
+	ISoundEngine* engine;
 
 private:
 	bool bPlay = true; // Continue to play game?

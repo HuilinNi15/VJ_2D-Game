@@ -1,5 +1,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <iostream>
+
 #include "Game.h"
 #include "Interface.h"
 
@@ -17,12 +19,21 @@ Game::~Game()
 	delete gameScreen;
 	delete instructionsScreen;
 	delete creditsScreen;
+
+	engine->drop();
 }
 
 void Game::init()
 {
 	bPlay = true;
 	glClearColor(0.0f, 0.67f, 1.0f, 1.0f);
+
+	engine = createIrrKlangDevice();
+	if (!engine) {
+		std::cerr << "Unable to create engine" << std::endl;
+	}
+	engine->play2D("media/getout.ogg", true); // true = set audio into a loop
+
 	mainScreen = new MainScreen();
 	menuScreen = new MenuScreen();
 	instructionsScreen = new InstructionsScreen();

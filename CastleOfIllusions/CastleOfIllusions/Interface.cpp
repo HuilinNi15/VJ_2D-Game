@@ -1,9 +1,9 @@
 #include <iostream>
 #include <cmath>
 #include <glm/gtc/matrix_transform.hpp>
-#include <vector>
+
 #include "Interface.h"
-#include "Object.h"
+#include "Player.h"
 
 
 Scene::Scene()
@@ -75,7 +75,7 @@ GameScene::GameScene(string level)
 
 	player = new Player();
 	player->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
-	player->setPosition(glm::vec2(map.map->getTileSize() * INIT_PLAYER_X_TILES, map.map->getTileSize() * INIT_PLAYER_Y_TILES)); 
+	player->setPosition(glm::vec2(map.map->getTileSize() * INIT_PLAYER_X_TILES, map.map->getTileSize() * INIT_PLAYER_Y_TILES));
 	player->setTileMap(&map);
 
 	// Load the Life Bar texture
@@ -121,12 +121,6 @@ GameScene::~GameScene()
 	delete player;
 
 	delete lifeBarSprite;
-	for (Object* entity : map.objects) {
-		delete entity; 
-	}
-	for (Enemy* entity : map.enemies) {
-		delete entity;
-	}
 }
 
 void GameScene::updateCam(int deltaTime)
@@ -167,16 +161,9 @@ void GameScene::update(int deltaTime)
 {
 	Scene::update(deltaTime);
 	player->update(deltaTime);
-	for (Object* entity : map.objects) {
-		entity->update(deltaTime);
-	}
-	for (Enemy* entity : map.enemies) {
-		entity->update(deltaTime);
-	}
 	updateCam(deltaTime);
 
 	lifeBarSprite->changeAnimation(player->getLives());
-	lifeBarSprite->setPosition(glm::vec2(cameraX, 160.f));
 }
 
 void GameScene::render()
@@ -184,12 +171,6 @@ void GameScene::render()
 	Scene::render();
 	map.decorations->render();
 	map.map->render();
-	for (Object* entity : map.objects) {
-		entity->render();
-	}
-	for (Enemy* entity : map.enemies) {
-		entity->render();
-	}
 	player->render();
 
 	lifeBarSprite->render();
