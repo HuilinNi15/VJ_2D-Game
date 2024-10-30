@@ -77,6 +77,6 @@ def modify_head(file_path, output_path):
     print(f"File modified and saved to {output_path}")
 
 # Usage
-map_list = ['./CastleOfIllusions/levels/forest_map.tmx']
+map_list = ['./CastleOfIllusions/CastleOfIllusions/levels/chocolate_map.tmx']
 for i in map_list:
     modify_head(i, i.replace('.tmx', '_prueba.txt'))

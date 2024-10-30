@@ -10,10 +10,15 @@ void MovableEntity::addAnimation(int animId, const glm::ivec2& size, const glm::
 	animations[animId] = { size, hitBox, hitBoxOffset };
 }
 
-void MovableEntity::changeAnimation(int animation)
+void MovableEntity::changeAnimation(int animation, float cooldown)
 {
-	if (sprite->animation() != animation)
-		sprite->changeAnimation(animation);
+	if (!animationInCooldown())
+	{
+		if (sprite->animation() != animation)
+			sprite->changeAnimation(animation);
+		if (cooldown > 0.0f)
+			animationCooldown = cooldown;
+	}
 }
 
 void MovableEntity::updateHitBox(int animId)
@@ -25,13 +30,21 @@ void MovableEntity::updateHitBox(int animId)
 
 void MovableEntity::update(int deltaTime)
 {
+	if (collisionCooldown > 0.0f)
+		collisionCooldown -= dt;
+	if (animationCooldown > 0.0f)
+		animationCooldown -= dt;
+	if (deactivateCooldown > 0.0f)
+		deactivateCooldown -= dt;
+	if (nextActionCooldown > 0.0f)
+		nextActionCooldown -= dt;
+
 	glm::vec2 velStart = vel;
 	dt = deltaTime / 1000.0f;
 
 	if (!isStatic && map->map != NULL)
 	{
-		calculateVelocity(deltaTime);
-		//std::cout << vel.x << " " << vel.y << std::endl; 
+		calculateVelocity();
 	}
 		
 	changeAnimations(deltaTime);
@@ -44,7 +57,7 @@ void MovableEntity::update(int deltaTime)
 }
 
 
-void MovableEntity::calculateVelocity(int deltaTime)
+void MovableEntity::calculateVelocity()
 {
 }
 
@@ -54,21 +67,26 @@ void MovableEntity::otherChanges()
 }
 
 
-void MovableEntity::recalculatePos(const glm::vec2& velStart)
+void MovableEntity::recalculatePos(const glm::vec2& velStart, bool MapCollision, bool EntityCollsion)
 {
 	avgVel.x = (velStart.x + vel.x) / 2.0f;
 	pos.x += avgVel.x * dt;
 	horizontalCollision = false; 
-	if (vel.x > 0.0f)
-		horizontalCollision = map->map->collisionMoveRight(pos, hitBox, hitBoxOffset);
-	else if (vel.x < 0.0f)
-		horizontalCollision = map->map->collisionMoveLeft(pos, hitBox, hitBoxOffset);
-	
-	if (!horizontalCollision && avgVel.x != 0.0f) {
-		collidedEnemy = checkCollisionEntities(map->enemies, false);
-		collidedObject = checkCollisionEntities(map->objects, false); 
 
-		if (collidedObject)
+	if (MapCollision)
+	{
+		if (vel.x > 0.0f && collisionCooldown <= 0.0f)
+			horizontalCollision = map->map->collisionMoveRight(pos, hitBox, hitBoxOffset);
+		else if (vel.x < 0.0f && collisionCooldown <= 0.0f)
+			horizontalCollision = map->map->collisionMoveLeft(pos, hitBox, hitBoxOffset);
+	}
+	
+	if (!horizontalCollision && avgVel.x != 0.0f && EntityCollsion) {
+		collidedEnemyX = checkCollisionEntities(map->enemies, false);
+		collidedObjectX = checkCollisionEntities(map->objects, false); 
+
+		Chest* chestX = dynamic_cast<Chest*>(collidedObjectX);
+		if (collidedObjectX && (chestX == nullptr || chestX->state == STATIC))
 		{
 			horizontalCollision = true; 
 		}
@@ -88,29 +106,33 @@ void MovableEntity::recalculatePos(const glm::vec2& velStart)
 	topCollision = false; 
 	downCollision = false; 
 
-	if (map->map->collisionMoveDown(pos, hitBox, hitBoxOffset, &pos.y))
+	if (MapCollision)
 	{
-		vel.y = 0.0f;
-		falling = false;
-		topCollision = true;
-	}
-	else if (map->map->collisionMoveUp(pos, hitBox, hitBoxOffset, &pos.y))
-	{
-		vel.y = 0.0f;
-		falling = true;
-		downCollision = true;
-	}
-	else
-	{
-		falling = true;
+		if (map->map->collisionMoveDown(pos, hitBox, hitBoxOffset, &pos.y) && collisionCooldown <= 0.0f)
+		{
+			vel.y = 0.0f;
+			falling = false;
+			topCollision = true; 
+		}
+		else if (map->map->collisionMoveUp(pos, hitBox, hitBoxOffset, &pos.y) && collisionCooldown <= 0.0f)
+		{
+			vel.y = 0.0f;
+			falling = true;
+			downCollision = true;
+		}
+		else
+		{
+			falling = true;
+		}
 	}
 
-	if (!topCollision && !downCollision)
+	if (!topCollision && !downCollision && EntityCollsion)
 	{
-		collidedEnemy = checkCollisionEntities(map->enemies, true);
-		collidedObject = checkCollisionEntities(map->objects, true);
+		collidedEnemyY = checkCollisionEntities(map->enemies, true);
+		collidedObjectY = checkCollisionEntities(map->objects, true);
 
-		if (collidedObject)
+		Chest* chestX = dynamic_cast<Chest*>(collidedObjectY);
+		if (collidedObjectY && (chestX == nullptr || chestX->state == STATIC))
 		{
 			if (vel.y >= 0)
 				falling = false;
@@ -133,14 +155,16 @@ bool MovableEntity::checkCollision(MovableEntity* other, float* posY, bool bot_o
 	{
 		if (bot_or_top)
 		{
-			if (vel.y < 0 && correctPos) // Correct position to be on top
+			if (vel.y < 0) // Correct position to be on top
 			{
-				*posY = otherBottom - hitBoxOffset.y;
+				if (correctPos)
+					*posY = otherBottom - hitBoxOffset.y;
 				topCollision = true;
 			}
-			else if (correctPos) // Correct position to be underneath
+			else // Correct position to be underneath
 			{
-				*posY = otherTop - hitBoxOffset.y - hitBox.y;
+				if (correctPos)
+					*posY = otherTop - hitBoxOffset.y - hitBox.y;
 				downCollision = true; 
 			}
 		}
@@ -149,22 +173,37 @@ bool MovableEntity::checkCollision(MovableEntity* other, float* posY, bool bot_o
 	return collision;
 }
 
-Object* MovableEntity::checkCollisionEntities(std::vector<Object*> entities, bool bot_or_top, bool correctPos)
-{
+Object* MovableEntity::checkCollisionEntities(std::vector<Object*> entities, bool bot_or_top, bool correctPos) {
 	for (Object* entity : entities) {
-		if (entity == this) continue; 
-		if (checkCollision(entity, &pos.y, bot_or_top, correctPos))
-			return entity; 
+		if (!entity) continue; 
+
+		Chest* chestX = dynamic_cast<Chest*>(entity);
+		if (chestX) {
+			if (chestX->state != STATIC) {
+				if (entity == this || entity->collisionInCooldown() || !entity->renderObject || chestX->isPickedUp()) {
+					continue;
+				}
+				if (checkCollision(entity, &pos.y, bot_or_top, false)) {
+					return entity;
+				}
+			}
+		}
+		if (entity == this || !entity->getActive() || entity->collisionInCooldown() || !entity->renderObject) {
+			continue;
+		}
+		if (checkCollision(entity, &pos.y, bot_or_top, correctPos)) {
+			return entity;
+		}
 	}
 	return nullptr;
 }
 
 Enemy* MovableEntity::checkCollisionEntities(std::vector<Enemy*> entities, bool bot_or_top, bool correctPos)
 {
-	for (Enemy* entity : entities) 
-	{
-		if (entity == this) continue; 
-		if (checkCollision(entity, &pos.y, bot_or_top, correctPos))
+	for (Enemy* entity : entities) {
+		if (entity == this || !entity->getActive() || entity->collisionInCooldown() || !entity->renderObject)
+			continue;
+		if (checkCollision(entity, &pos.y, bot_or_top, false))
 			return entity;
 	}
 	return nullptr;
@@ -182,10 +221,6 @@ void MovableEntity::render()
 	sprite->render();
 }
 
-void MovableEntity::setStatic()
-{
-	isStatic = !isStatic;
-}
 
 void MovableEntity::setTileMap(mapData* tileMap)
 {
@@ -196,4 +231,19 @@ void MovableEntity::setPosition(const glm::vec2& position)
 {
 	pos = position;
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + pos.x), float(tileMapDispl.y + pos.y)));
+}
+
+void MovableEntity::setInvisible()
+{
+	renderObject = !renderObject; 
+}
+
+void MovableEntity::setStatic()
+{
+	isStatic = !isStatic;
+}
+
+void MovableEntity::setActive()
+{
+	isActive = !isActive; 
 }

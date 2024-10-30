@@ -5,6 +5,7 @@
 #include <GLFW/glfw3.h>
 #include "Interface.h"
 
+#include <iostream>
 #include <irrKlang.h>
 using namespace irrklang;
 

@@ -182,41 +182,52 @@ void TileMap::prepareArrays(const glm::vec2& minCoords, ShaderProgram& program)
 }
 
 
-//std::vector<Enemy*> TileMap::getEnemies(const std::string& levelFile, ShaderProgram& program, mapData* map) {
-//	std::ifstream file(levelFile);
-//	std::string line;
-//	std::vector<Enemy*> enemies;
-//	bool inEnemiesSection = false;
-//
-//	if (file.is_open()) {
-//		while (getline(file, line)) {
-//			if (line.find("ENEMIES") != std::string::npos) {
-//				inEnemiesSection = true;
-//				continue;
-//			}
-//			if (inEnemiesSection) {
-//				if (line.empty() || line.find("OBJECTS") != std::string::npos) break;
-//
-//				Enemy* enemy; 
-//				if (line[0] == 1)
-//					enemy = new Enemy1();
-//				else if (line[0] == 2)
-//					enemy = new Enemy2(); 
-//
-//				enemy->init(glm::ivec2(SCREEN_X, SCREEN_Y), program);
-//				enemy->setPosition(glm::vec2(line[1], line[2]));
-//				enemy->setTileMap(map);
-//				 
-//				enemies.push_back(enemy);
-//			}
-//		}
-//		file.close();
-//	}
-//	else {
-//		std::cerr << "Unable to open file: " << levelFile << std::endl;
-//	}
-//	return enemies;
-//}
+std::vector<Enemy*> TileMap::getEnemies(const std::string& levelFile, ShaderProgram& program, mapData* map) {
+	std::ifstream file(levelFile);
+	std::string line;
+	std::vector<Enemy*> enemies;
+	bool inEnemiesSection = false;
+	
+	int tilesize = map->map->getTileSize();
+
+	if (file.is_open()) {
+		while (getline(file, line)) {
+			if (line.find("ENEMIES") != std::string::npos) {
+				inEnemiesSection = true;
+				continue;
+			}
+			if (inEnemiesSection) {
+				if (line.empty() || line.find("OBJECTS") != std::string::npos) break;
+
+				std::istringstream lineStream(line);
+				int id, x, y;
+				lineStream >> id >> x >> y;
+
+				Enemy* enemy = nullptr;
+				if (id == 0)
+					enemy = new Tree;
+				//else if (line[0] == 8)
+				//	enemy = new Plant; 
+
+				if (enemy)
+				{
+					enemy->init(glm::ivec2(SCREEN_X, SCREEN_Y), program);
+					enemy->setPosition(glm::vec2(tilesize * x, tilesize * y - 16));
+					enemy->setPlayer(map->player);
+					enemy->setTileMap(map);
+					enemies.push_back(enemy);
+				}
+			}
+		}
+		file.close();
+	}
+	else {
+		std::cerr << "Unable to open file: " << levelFile << std::endl;
+	}
+	return enemies;
+}
+
+
 
 std::vector<Object*> TileMap::getObjects(const std::string& levelFile, ShaderProgram& program, mapData* map) {
 	std::ifstream file(levelFile);
@@ -241,10 +252,10 @@ std::vector<Object*> TileMap::getObjects(const std::string& levelFile, ShaderPro
 
 				Object* object = nullptr;
 				if (id == 1)
-					object = new Barrel();
+					object = new Gem();
 				else if (id == 0)
 					object = new Stone();
-				else if (id == 4)
+				else if (id == 5)
 					object = new Chest();
 
 				if (object) { // Only proceed if object was successfully created

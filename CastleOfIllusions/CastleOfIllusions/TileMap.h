@@ -27,7 +27,7 @@ private:
 public:
 	// Tile maps can only be created inside an OpenGL context
 	static TileMap* createTileMap(const string& levelFile, const glm::vec2& minCoords, ShaderProgram& program, bool save_decoration = false);
-	//static std::vector<Enemy*> TileMap::getEnemies(const std::string& levelFile, ShaderProgram& program, mapData* map);
+	static std::vector<Enemy*> TileMap::getEnemies(const std::string& levelFile, ShaderProgram& program, mapData* map);
 	static std::vector<Object*> TileMap::getObjects(const std::string& levelFile, ShaderProgram& program, mapData* map);
 
 	~TileMap();

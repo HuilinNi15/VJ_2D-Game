@@ -6,6 +6,7 @@
 #include "Player.h"
 
 
+
 Scene::Scene()
 {
 	initShaders();
@@ -15,7 +16,6 @@ Scene::Scene()
 
 Scene::~Scene()
 {
-
 }
 
 void Scene::initShaders()
@@ -26,13 +26,15 @@ void Scene::initShaders()
 	if (!vShader.isCompiled())
 	{
 		cout << "Vertex Shader Error" << endl;
-		cout << "" << vShader.log() << endl << endl;
+		cout << "" << vShader.log() << endl
+			 << endl;
 	}
 	fShader.initFromFile(FRAGMENT_SHADER, "shaders/texture.frag");
 	if (!fShader.isCompiled())
 	{
 		cout << "Fragment Shader Error" << endl;
-		cout << "" << fShader.log() << endl << endl;
+		cout << "" << fShader.log() << endl
+			 << endl;
 	}
 	texProgram.init();
 	texProgram.addShader(vShader);
@@ -41,7 +43,8 @@ void Scene::initShaders()
 	if (!texProgram.isLinked())
 	{
 		cout << "Shader Linking Error" << endl;
-		cout << "" << texProgram.log() << endl << endl;
+		cout << "" << texProgram.log() << endl
+			 << endl;
 	}
 	texProgram.bindFragmentOutput("outColor");
 	vShader.free();
@@ -66,17 +69,19 @@ void Scene::render()
 
 
 
-GameScene::GameScene(string level)
+GameScene::GameScene(bool ForestMap) : targetCameraY(cameraPos.y)
 {
 	map.map = TileMap::createTileMap(level, glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 	map.decorations = TileMap::createTileMap(level, glm::vec2(SCREEN_X, SCREEN_Y), texProgram, true);
-	//map.enemies = TileMap::getEnemies(level, texProgram);
-	map.objects = TileMap::getObjects(level, texProgram, &map);
-
+	
 	player = new Player();
 	player->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 	player->setPosition(glm::vec2(map.map->getTileSize() * INIT_PLAYER_X_TILES, map.map->getTileSize() * INIT_PLAYER_Y_TILES));
 	player->setTileMap(&map);
+	map.player = player; 
+
+	map.enemies = TileMap::getEnemies(level, texProgram, &map);
+	map.objects = TileMap::getObjects(level, texProgram, &map);
 
 	// Load the Life Bar texture
 	lifeBarTexture.loadFromFile("images/screens/LifeBar.png", TEXTURE_PIXEL_FORMAT_RGBA);
@@ -104,10 +109,8 @@ GameScene::GameScene(string level)
 	lifeBarSprite->setAnimationSpeed(THREE_STARS, 1);
 	lifeBarSprite->addKeyframe(THREE_STARS, glm::vec2(x * 0.f, y * 3.f));
 
-
 	lifeBarSprite->changeAnimation(THREE_STARS);
 	lifeBarSprite->setPosition(glm::vec2(0.f, 160.f)); // Position the background at (0, 160)
-
 
 	// Select which font you want to use
 	if (!text.init("fonts/zx_spectrum-7_bold.ttf"))
@@ -121,6 +124,14 @@ GameScene::~GameScene()
 	delete player;
 
 	delete lifeBarSprite;
+	for (Object *entity : map.objects)
+	{
+		delete entity;
+	}
+	for (Enemy *entity : map.enemies)
+	{
+		delete entity;
+	}
 }
 
 void GameScene::updateCam(int deltaTime)
@@ -135,36 +146,44 @@ void GameScene::updateCam(int deltaTime)
 	float deadZoneWidth = CAMERA_WIDTH / DEAD_ZONE_SIZE;
 
 	// Define the dead zone boundaries
-	float deadZoneLeft = cameraX - 16 + (CAMERA_WIDTH - deadZoneWidth) / 2.0f;
-	float deadZoneRight = cameraX - 16 + (CAMERA_WIDTH + deadZoneWidth) / 2.0f;
+	float deadZoneLeft = cameraPos.x - 16 + (CAMERA_WIDTH - deadZoneWidth) / 2.0f;
+	float deadZoneRight = cameraPos.x - 16 + (CAMERA_WIDTH + deadZoneWidth) / 2.0f;
 
 	// Check if the player is outside the dead zone (horizontally)
 	if (posPlayer.x < deadZoneLeft)
 	{
-		cameraX -= (deadZoneLeft - posPlayer.x);  // Move camera left
+		cameraPos.x -= (deadZoneLeft - posPlayer.x); // Move camera left
 	}
 	else if (posPlayer.x > deadZoneRight)
 	{
-		cameraX += (posPlayer.x - deadZoneRight);  // Move camera right
+		cameraPos.x += (posPlayer.x - deadZoneRight); // Move camera right
 	}
 
 	// Clamp the camera to not go out of the map boundaries
-	if (cameraX < 0)
-		cameraX = 0;
-	else if (cameraX + CAMERA_WIDTH > mapWidth)
-		cameraX = (float)mapWidth - CAMERA_WIDTH;
+	if (cameraPos.x < 0)
+		cameraPos.x = 0;
+	else if (cameraPos.x + CAMERA_WIDTH > mapWidth)
+		cameraPos.x = (float)mapWidth - CAMERA_WIDTH;
 
-	projection = glm::ortho(cameraX, cameraX + float(CAMERA_WIDTH), float(CAMERA_HEIGHT), 0.f);
+	projection = glm::ortho(cameraPos.x, cameraPos.x + float(CAMERA_WIDTH), float(CAMERA_HEIGHT), 0.f);
 }
 
 void GameScene::update(int deltaTime)
 {
 	Scene::update(deltaTime);
 	player->update(deltaTime);
+	for (Object *entity : map.objects)
+	{
+		entity->update(deltaTime);
+	}
+	for (Enemy *entity : map.enemies)
+	{
+		entity->update(deltaTime);
+	}
 	updateCam(deltaTime);
 
 	lifeBarSprite->changeAnimation(player->getLives());
-	lifeBarSprite->setPosition(glm::vec2(cameraX, 160.f));
+	lifeBarSprite->setPosition(glm::vec2(cameraPos.x, 160.f));
 }
 
 void GameScene::render()
@@ -172,16 +191,21 @@ void GameScene::render()
 	Scene::render();
 	map.decorations->render();
 	map.map->render();
+	for (Object *entity : map.objects)
+	{
+		entity->render();
+	}
+	for (Enemy *entity : map.enemies)
+	{
+		entity->render();
+	}
 	player->render();
-
 	lifeBarSprite->render();
 
 	text.render(player->getTries(), glm::vec2(600, 900), 32, glm::vec4(1, 1, 1, 1));
 	text.render(player->getScore(), glm::vec2(765, 900), 32, glm::vec4(1, 1, 1, 1));
 	text.render(getCurrentTime(), glm::vec2(1060, 900), 32, glm::vec4(1, 1, 1, 1));
 }
-
-
 
 MainScreen::MainScreen()
 {
@@ -201,7 +225,7 @@ MainScreen::MainScreen()
 	// Create the Mickey sprite and set its position and animation
 	mickeySprite = new Player();
 	mickeySprite->init(glm::ivec2(112, 128), texProgram); // Mickey sprite position
-	mickeySprite->changeAnimation(WAVING_HAND); // Waving animation
+	mickeySprite->changeAnimation(WAVING_HAND);			  // Waving animation
 	mickeySprite->setStatic();
 
 	// Load the text texture
@@ -220,26 +244,24 @@ MainScreen::MainScreen()
 
 MainScreen::~MainScreen()
 {
-    delete backgroundSprite;
-    delete mickeySprite;
+	delete backgroundSprite;
+	delete mickeySprite;
 	delete textSprite;
 }
 
-void MainScreen::update(int deltaTime) 
+void MainScreen::update(int deltaTime)
 {
 	Scene::update(deltaTime);
-    mickeySprite->update(deltaTime);
+	mickeySprite->update(deltaTime);
 }
 
-void MainScreen::render() 
+void MainScreen::render()
 {
 	Scene::render();
-    backgroundSprite->render();
+	backgroundSprite->render();
 	mickeySprite->render();
 	textSprite->render();
 }
-
-
 
 MenuScreen::MenuScreen()
 {
@@ -258,7 +280,6 @@ MenuScreen::MenuScreen()
 	backgroundSprite->changeAnimation(0);
 	backgroundSprite->setPosition(glm::vec2(0, 0)); // Position the background at (0, 0)
 
-	
 	optionsTexture.loadFromFile("images/screens/options_MenuScreen.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	optionsTexture.setMinFilter(GL_NEAREST);
 	optionsTexture.setMagFilter(GL_NEAREST);
@@ -290,7 +311,7 @@ MenuScreen::MenuScreen()
 	// Create the instructions screen sprite
 	instructionsSprite = Sprite::createSprite(size, glm::vec2(x, y), &optionsTexture, &texProgram);
 	instructionsSprite->setNumberAnimations(2);
- 
+
 	instructionsSprite->setAnimationSpeed(0, 1);
 	instructionsSprite->addKeyframe(0, glm::vec2(x * 0.f, y * 4.f));
 
@@ -345,7 +366,7 @@ int MenuScreen::getSelectedOption()
 	return selectedOption;
 }
 
-void MenuScreen::update(int deltaTime) 
+void MenuScreen::update(int deltaTime)
 {
 	Scene::update(deltaTime);
 
@@ -364,7 +385,7 @@ void MenuScreen::update(int deltaTime)
 		creditsSprite->changeAnimation(1);
 }
 
-void MenuScreen::render() 
+void MenuScreen::render()
 {
 	Scene::render();
 	backgroundSprite->render();
@@ -374,8 +395,7 @@ void MenuScreen::render()
 	creditsSprite->render();
 }
 
-
-InstructionsScreen::InstructionsScreen() 
+InstructionsScreen::InstructionsScreen()
 {
 	// Load the background texture
 	backgroundTexture.loadFromFile("images/screens/black_screen.png", TEXTURE_PIXEL_FORMAT_RGBA);
@@ -389,7 +409,6 @@ InstructionsScreen::InstructionsScreen()
 	backgroundSprite->addKeyframe(0, glm::vec2(0.f, 0.f));
 	backgroundSprite->changeAnimation(0);
 	backgroundSprite->setPosition(glm::vec2(0, 0)); // Position the background at (0, 0)
-
 
 	// Load the Instructions texture
 	instructionsTexture.loadFromFile("images/screens/InstructionsScreen.png", TEXTURE_PIXEL_FORMAT_RGBA);
@@ -411,18 +430,17 @@ InstructionsScreen::~InstructionsScreen()
 	delete instructionsSprite;
 }
 
-void InstructionsScreen::update(int deltaTime) 
+void InstructionsScreen::update(int deltaTime)
 {
 	Scene::update(deltaTime);
 }
 
-void InstructionsScreen::render() 
+void InstructionsScreen::render()
 {
 	Scene::render();
 	backgroundSprite->render();
 	instructionsSprite->render();
 }
-
 
 CreditsScreen::CreditsScreen()
 {
@@ -438,7 +456,6 @@ CreditsScreen::CreditsScreen()
 	backgroundSprite->addKeyframe(0, glm::vec2(0.f, 0.f));
 	backgroundSprite->changeAnimation(0);
 	backgroundSprite->setPosition(glm::vec2(0, 0)); // Position the background at (0, 0)
-
 
 	// Load the Instructions texture
 	creditsTexture.loadFromFile("images/screens/CreditsScreen.png", TEXTURE_PIXEL_FORMAT_RGBA);
@@ -460,12 +477,12 @@ CreditsScreen::~CreditsScreen()
 	delete creditsSprite;
 }
 
-void CreditsScreen::update(int deltaTime) 
+void CreditsScreen::update(int deltaTime)
 {
 	Scene::update(deltaTime);
 }
 
-void CreditsScreen::render() 
+void CreditsScreen::render()
 {
 	backgroundSprite->render();
 	creditsSprite->render();

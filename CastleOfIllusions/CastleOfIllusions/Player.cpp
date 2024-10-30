@@ -3,7 +3,7 @@
 #include <GL/glew.h>
 #include "Player.h"
 #include "Game.h"
-
+#include <typeinfo>
 
 
 void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
@@ -43,11 +43,11 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 	addAnimation(WAVING_HAND, size, glm::ivec2(20, 30), glm::ivec2(6, 18));
 	addAnimation(CARRY_STAND_LEFT, size, glm::ivec2(20, 30), glm::ivec2(6, 18));
 
-	addAnimation(CARRY_STAND_RIGHT, size, glm::ivec2(20, 30), glm::ivec2(6, 18));
+	addAnimation(CARRY_STAND_RIGHT, size, glm::ivec2(20, 30), glm::ivec2(10, 18));
 	addAnimation(CARRY_MOVE_LEFT, size, glm::ivec2(20, 30), glm::ivec2(6, 18));
-	addAnimation(CARRY_MOVE_RIGHT, size, glm::ivec2(20, 30), glm::ivec2(6, 18));
+	addAnimation(CARRY_MOVE_RIGHT, size, glm::ivec2(20, 30), glm::ivec2(10, 18));
 	addAnimation(CARRY_JUMP_LEFT, size, glm::ivec2(20, 30), glm::ivec2(6, 18));
-	addAnimation(CARRY_JUMP_RIGHT, size, glm::ivec2(20, 30), glm::ivec2(6, 18));
+	addAnimation(CARRY_JUMP_RIGHT, size, glm::ivec2(20, 30), glm::ivec2(10, 18));
 
 	sprite = Sprite::createSprite(size, glm::vec2(x, y), &spritesheet, &shaderProgram);
 	sprite->setNumberAnimations(animations.size());
@@ -150,7 +150,7 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 		sprite->addKeyframe(CARRY_STAND_RIGHT, glm::vec2(x * 4, y * 4));
 		sprite->addKeyframe(CARRY_STAND_RIGHT, glm::vec2(x * 5, y * 4));
 
-		sprite->setAnimationSpeed(CARRY_MOVE_LEFT, 25);
+		sprite->setAnimationSpeed(CARRY_MOVE_LEFT, 15);
 		sprite->addKeyframe(CARRY_MOVE_LEFT, glm::vec2(x * 6, y * 7));
 		sprite->addKeyframe(CARRY_MOVE_LEFT, glm::vec2(x * 1, y * 7));
 		sprite->addKeyframe(CARRY_MOVE_LEFT, glm::vec2(x * 2, y * 7));
@@ -158,7 +158,7 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 		sprite->addKeyframe(CARRY_MOVE_LEFT, glm::vec2(x * 4, y * 7));
 		sprite->addKeyframe(CARRY_MOVE_LEFT, glm::vec2(x * 5, y * 7));
 
-		sprite->setAnimationSpeed(CARRY_MOVE_RIGHT, 25);
+		sprite->setAnimationSpeed(CARRY_MOVE_RIGHT, 15);
 		sprite->addKeyframe(CARRY_MOVE_RIGHT, glm::vec2(x * 6, y * 6));
 		sprite->addKeyframe(CARRY_MOVE_RIGHT, glm::vec2(x * 1, y * 6));
 		sprite->addKeyframe(CARRY_MOVE_RIGHT, glm::vec2(x * 2, y * 6));
@@ -182,7 +182,7 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 }
 
 
-void Player::calculateVelocity(int deltaTime)
+void Player::calculateVelocity()
 {
 	if (Game::instance().getKey(GLFW_KEY_A))
 		handleMove(-1.0f);
@@ -245,13 +245,13 @@ void Player::handleJump()
 
 void Player::handleCrouch()
 {
-	if (Game::instance().getKey(GLFW_KEY_S))
+	if (Game::instance().getKey(GLFW_KEY_S) && carrying == nullptr)
 	{
 		if (!falling)
 		{
 			crouching = true;
 			stopping = true;
-			moving = false; 
+			moving = false;
 		}
 		else
 			attacking = true; 
@@ -264,30 +264,94 @@ void Player::handleCrouch()
 }
 
 
+void Player::pickUpCakeorCoin(Chest* chest)
+{
+	if (!chest->isPickedUp())
+	{
+		if (chest->state == COIN)
+			addPoints(1000);
+		else if (chest->state == CAKE)
+			addLives(1);
+
+		chest->destroy();
+		chest->setPickedUp();
+	}
+}
+
+
 void Player::otherChanges()
 {
 	if (topCollision)
 		attacking = false;
 
-	if (Game::instance().getKey(GLFW_KEY_E))
-	{
-		if (moving && !falling && collidedObject && vel == glm::vec2(0.f, 0.f))
-		{
-			pickUp(collidedObject);
-			collidedObject->pickUp(this);
+	bool eKeyCurrentlyPressed = Game::instance().getKey(GLFW_KEY_E);
+
+	if (eKeyCurrentlyPressed && !eKeyPreviouslyPressed) {
+		if (moving && !falling && collidedObjectX && vel == glm::vec2(0.f, 0.f)) {
+
+			float object_Y = collidedObjectX->getPosition().y + collidedObjectX->getHitBoxOffset().y + collidedObjectX->getHitBox().y;
+			float player_Y = pos.y + hitBoxOffset.y + hitBox.y;
+
+			if (object_Y == player_Y)
+			{
+				pickUp(collidedObjectX);
+				collidedObjectX->pickUp(this);
+			}
 		}
-		else if (carrying)
-		{
-			carrying->throwObject(); 
+		else if (carrying) {
+			glm::vec2 velocity = THROW_VEL; 
+			if (typeid(*carrying) == typeid(Barrel)) { velocity.x = 50.0f; }
+			if (!facingRight) { velocity.x *= -1; }
+			carrying->throwObject(velocity);
 			throwObject();
 		}
 	}
-
-	else if (attacking && collidedObject)
+	
+	if (attacking && collidedObjectY)
 	{
-		collidedObject->breakObject();
+		if (typeid(*collidedObjectY) == typeid(Stone))
+		{
+			collidedObjectY->breakObject();
+			jump(BOUNCE_VELOCITY);
+		}
+		else if (typeid(*collidedObjectY) == typeid(Chest))
+		{
+			Chest* chest = dynamic_cast<Chest*>(collidedObjectY);
+			if (chest && chest->state != CAKE && chest->state != COIN)
+			{
+				chest->breakObject();
+				jump(BOUNCE_VELOCITY);
+			}
+		}
+	}
+	else if (attacking && collidedEnemyY)
+	{
+		collidedEnemyY->kill(); 
 		jump(BOUNCE_VELOCITY);
 	}
+	else
+	{
+		Chest* chestX = dynamic_cast<Chest*>(collidedObjectX);
+		Chest* chestY = dynamic_cast<Chest*>(collidedObjectY);
+		if (chestX) {
+			if (chestX->state == COIN || chestX->state == CAKE)
+				pickUpCakeorCoin(chestX); 
+		}
+		else if (chestY) {
+			if (chestY->state == COIN || chestY->state == CAKE)
+				pickUpCakeorCoin(chestY);
+		}
+		else if (Gem* gemX = dynamic_cast<Gem*>(collidedObjectX)) {
+			WIN = true;
+			delete collidedObjectX;
+		}
+		else if (Gem* gemY = dynamic_cast<Gem*>(collidedObjectY)) {
+			WIN = true;
+			delete collidedObjectY;
+		}
+	}
+
+	eKeyPreviouslyPressed = eKeyCurrentlyPressed;
 }
 
 
@@ -344,15 +408,15 @@ void Player::changeAnimations(int deltaTime)
 		}
 	}
 
-	else if (moving && !falling && collidedObject && vel == glm::vec2(20.f, 0.f))
+	else if (moving && !falling && collidedObjectX && std::abs(vel.x) == 20.f && vel.y == 0.f)
 	{
 		if (facingRight) {
 			changeAnimation(PREPARE_PICKUP_RIGHT);
 			updateHitBox(PREPARE_PICKUP_RIGHT);
 		}
 		else {
-			changeAnimation(PREPARE_PICKUP_RIGHT);
-			updateHitBox(PREPARE_PICKUP_RIGHT);
+			changeAnimation(PREPARE_PICKUP_LEFT);
+			updateHitBox(PREPARE_PICKUP_LEFT);
 		}
 	}
 
@@ -384,13 +448,27 @@ void Player::changeAnimations(int deltaTime)
 
 	else if (stopping && !falling && !crouching)
 	{
-		if (facingRight) {
-			changeAnimation(STOP_RIGHT);
-			updateHitBox(STOP_RIGHT);
+		if (carrying)
+		{
+			if (facingRight) {
+				changeAnimation(CARRY_MOVE_RIGHT);
+				updateHitBox(CARRY_MOVE_RIGHT);
+			}
+			else {
+				changeAnimation(CARRY_MOVE_LEFT);
+				updateHitBox(CARRY_MOVE_LEFT);
+			}
 		}
-		else {
-			changeAnimation(STOP_LEFT);
-			updateHitBox(STOP_LEFT);
+		else
+		{
+			if (facingRight) {
+				changeAnimation(STOP_RIGHT);
+				updateHitBox(STOP_RIGHT);
+			}
+			else {
+				changeAnimation(STOP_LEFT);
+				updateHitBox(STOP_LEFT);
+			}
 		}
 	}
 

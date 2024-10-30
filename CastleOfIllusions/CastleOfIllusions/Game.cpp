@@ -56,7 +56,7 @@ void Game::render()
 
 void Game::keyPressed(int key)
 {
-	if(key == GLFW_KEY_ESCAPE) // Escape code
+	if (key == GLFW_KEY_ESCAPE) // Escape code
 		bPlay = false;
 	if (key == GLFW_KEY_SPACE)  // Space key switches screens
 	{
@@ -68,13 +68,19 @@ void Game::keyPressed(int key)
 
 			if (selectedOption == 0)
 			{
-				gameScreen = new GameScene("levels/forest_map_prueba.txt");
+				gameScreen = new GameScene(true);
+				glClearColor(0.0f, 0.67f, 1.0f, 1.0f);
 				currentScreen = gameScreen;
+				engine->stopAllSounds();
+				engine->play2D("media/EnchantedForest.ogg", true);
 			}
 			else if (selectedOption == 1)
 			{
-				gameScreen = new GameScene("levels/chocolate_map.txt");
+				gameScreen = new GameScene(false);
+				glClearColor(0.627f, 0.314f, 1.0f, 1.0f);
 				currentScreen = gameScreen;
+				engine->stopAllSounds();
+				engine->play2D("media/DessertFactory.ogg", true);
 			}
 			else if (selectedOption == 2)
 			{
@@ -85,19 +91,25 @@ void Game::keyPressed(int key)
 				currentScreen = creditsScreen;
 			}
 		}
-		else if (currentScreen == creditsScreen || currentScreen == instructionsScreen) 
+		else if (currentScreen == creditsScreen || currentScreen == instructionsScreen)
 			currentScreen = menuScreen;
 	}
 
-	if(key == GLFW_KEY_UP)
+	if (key == GLFW_KEY_UP)
 	{
 		if (currentScreen == menuScreen)
+		{
 			static_cast<MenuScreen*>(currentScreen)->updateSelection(-1);
+			engine->play2D("media/menuOptionSelection.ogg", false);
+		}
 	}
 	else if (key == GLFW_KEY_DOWN)
 	{
 		if (currentScreen == menuScreen)
+		{
 			static_cast<MenuScreen*>(currentScreen)->updateSelection(1);
+			engine->play2D("media/menuOptionSelection.ogg", false);
+		}
 	}
 	keys[key] = true;
 }

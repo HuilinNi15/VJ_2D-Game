@@ -79,10 +79,14 @@ public:
     virtual void update(int deltaTime) override;
     virtual void render() override;
 
+    bool isForestMap;
+
 private:
     void updateCam(int deltaTime);
 
-    float cameraX = 0.0f; 
+    glm::vec2 cameraPos = glm::vec2(0.f, 0.f); 
+    float targetCameraY;
+
     float cameraSpeed = 10.0f;
 
     Player* player;
