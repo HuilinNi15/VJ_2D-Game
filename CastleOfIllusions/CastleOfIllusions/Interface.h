@@ -3,7 +3,13 @@
 
 #include <glm/glm.hpp>
 #include <vector>
+#include <string>
+
 #include "ShaderProgram.h"
+#include "Quad.h"
+#include "TexturedQuad.h"
+#include "Text.h"
+
 #include "TileMap.h"
 #include "Texture.h"
 #include "Sprite.h"
@@ -44,11 +50,20 @@ public:
     virtual void update(int deltaTime);
     virtual void render();
 
+    Text text;
+
+    std::string getCurrentTime() const {
+        std::ostringstream oss;
+        oss << std::setw(2) << std::setfill('0') << int(Time - currentTime / 1000.f);  // Pads with '0' to a width of 2
+        return oss.str();
+    }
+
 protected:
     void initShaders();
 
-    ShaderProgram texProgram;
+    ShaderProgram texProgram, simpleProgram;
     float currentTime;
+    float Time = 400.f;
     glm::mat4 projection;
 };
 

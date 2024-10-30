@@ -1,6 +1,9 @@
 #ifndef _PLAYER_INCLUDE
 #define _PLAYER_INCLUDE
 
+#include <string>
+#include <iomanip>
+#include <sstream>
 
 #include "Sprite.h"
 #include "TileMap.h"
@@ -39,6 +42,20 @@ public:
 	void init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram) override;
 	void changeAnimation(PlayerAnims animation);
 
+	int getLives() { return lives; };
+
+	std::string getTries() const {
+		std::ostringstream oss;
+		oss << std::setw(2) << std::setfill('0') << tries;  // Pads with '0' to a width of 2
+		return oss.str();
+	}
+
+	std::string getScore() const {
+		std::ostringstream oss;
+		oss << std::setw(6) << std::setfill('0') << score;  // Pads with '0' to a width of 6
+		return oss.str();
+	}
+
 private:
 	void handleMove(float direction);
 	void handleJump();
@@ -51,6 +68,10 @@ private:
 	bool stopping = false; // if true, player is slowing down horizontally
 	bool attacking = false; // if true, player attacking while jumping
 	bool crouching = false; // if true, player is crouched down
+
+	int lives = 3;
+	int tries = 3;
+	int score = 0; 
 };
 
 

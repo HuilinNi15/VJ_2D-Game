@@ -105,6 +105,11 @@ GameScene::GameScene(string level)
 
 	lifeBarSprite->changeAnimation(THREE_STARS);
 	lifeBarSprite->setPosition(glm::vec2(0.f, 160.f)); // Position the background at (0, 160)
+
+
+	// Select which font you want to use
+	if (!text.init("fonts/zx_spectrum-7_bold.ttf"))
+		cout << "Could not load font!!!" << endl;
 }
 
 GameScene::~GameScene()
@@ -155,6 +160,8 @@ void GameScene::update(int deltaTime)
 	Scene::update(deltaTime);
 	player->update(deltaTime);
 	updateCam(deltaTime);
+
+	lifeBarSprite->changeAnimation(player->getLives());
 }
 
 void GameScene::render()
@@ -165,6 +172,10 @@ void GameScene::render()
 	player->render();
 
 	lifeBarSprite->render();
+
+	text.render(player->getTries(), glm::vec2(600, 900), 32, glm::vec4(1, 1, 1, 1));
+	text.render(player->getScore(), glm::vec2(765, 900), 32, glm::vec4(1, 1, 1, 1));
+	text.render(getCurrentTime(), glm::vec2(1060, 900), 32, glm::vec4(1, 1, 1, 1));
 }
 
 
